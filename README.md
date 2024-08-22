@@ -87,3 +87,5 @@ php artisan make:middleware AdminAuth
 routes/auth.php file updated post calling method
 AuthenticatedSessionController.php file added new custom function for login
 
+- **[Resize uploaded image file]**
+composer require intervention/image

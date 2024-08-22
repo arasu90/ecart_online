@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -16,6 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+
         return view('auth.login');
     }
 
@@ -28,7 +31,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // return redirect()->back()->with('error', 'Please provide valid credentials');
+        // dd(Redirect::getIntendedUrl());
+        return redirect()->intended(URL::previous());
+        // return redirect()->intended(route('home', absolute: false));
     }
 
     /**
@@ -60,7 +66,7 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route('adminDashboardShow');
             }
             else{
-                return redirect()->route('dashboard');
+                return redirect()->intended(URL::previous());
             }
         }
         else{

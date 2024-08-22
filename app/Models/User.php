@@ -45,4 +45,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function ratings(){
+        return $this->hasmany(ProductReview::class, 'created_by');
+    }
 }

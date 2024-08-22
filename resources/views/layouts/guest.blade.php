@@ -31,6 +31,7 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <!-- <link href="{{ asset('css/custom.css') }}" rel="stylesheet"> -->
 </head>
 
 <body>
@@ -59,6 +60,72 @@
 
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
+    @stack('scripts')
+    <script type="text/javascript">
+        const current = document.getElementById("current");
+        const opacity = 0.6;
+        const imgs = document.querySelectorAll(".img");
+        imgs.forEach(img => {
+            img.addEventListener("click", (e) => {
+                //reset opacity
+                imgs.forEach(img => {
+                    img.style.opacity = 1;
+                });
+                current.src = e.target.src;
+                //adding class 
+                //current.classList.add("fade-in");
+                //opacity
+                e.target.style.opacity = opacity;
+            });
+        });
+
+        function addtocart(id){
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            var product_id = id;
+            var quantity = "1";
+
+            $.ajax({
+                url: '{{route("addtocart")}}',
+                method: "POST",
+                data: {
+                    'quantity': quantity,
+                    'product_id': product_id,
+                },
+                success: function (response) {
+                    var cart_count = response.cartcount;
+                    $('#cart_count').text(cart_count);
+                },
+            });
+
+        /* $.ajax({
+            url: '{{route("addtocart")}}',
+            method: 'POST',
+            data: {
+                'product_id':'3',
+            },
+            dataType: 'JSON',
+            "headers": {'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            contentType: false,
+            cache: false,
+            processData: false,
+            success:function(response)
+            {
+               console.log(response);
+            },
+            error: function(response)
+            {
+                console.log(response);    
+            }
+        }); */
+        }
+    </script>
+
 </body>
 
 </html>
