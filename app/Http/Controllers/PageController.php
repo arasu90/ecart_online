@@ -5,6 +5,8 @@ use App\Models\CartItem;
 use App\Models\CartMaster;
 use App\Models\Category;
 use App\Models\HomeBanner;
+use App\Models\OrderItem;
+use App\Models\OrderMaster;
 use App\Models\Product;
 use App\Models\ProductReview;
 use Exception;
@@ -15,6 +17,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+
+// use Validator;
+
+
 class PageController extends Controller
 {
     public $cart_count=0;
@@ -23,8 +29,13 @@ class PageController extends Controller
 
         // $cart = CartMaster::with('cart_count')->count();
         if(Auth::user()){
-            $cart = CartMaster::with('cart_count')->first();
-            $this->cart_count = count($cart->cart_count);
+            // DB::enableQueryLog();
+            $cart = CartMaster::with(['cart_count'])->where('cart_status',1)->where('user_id',Auth::user()->id)->first();
+            // $query = DB::getQueryLog();
+            // dd($cart);
+            if($cart != null){
+                $this->cart_count = count($cart->cart_count);
+            }
         }
         // dd(count($cart->cart_count));
         session(['cart' => $this->cart_count]);
@@ -67,15 +78,18 @@ class PageController extends Controller
         $list = ['Andaman and Nicobar Islands', 'Haryana', 'Tamil Nadu', 'Madhya Pradesh', 'Jharkhand', 'Mizoram', 'Nagaland', 'Himachal Pradesh', 'Tripura', 'Andhra Pradesh', 'Punjab', 'Chandigarh', 'Rajasthan', 'Assam', 'Odisha', 'Chhattisgarh', 'Jammu and Kashmir', 'Karnataka', 'Manipur', 'Kerala', 'Delhi', 'Puducherry', 'Uttarakhand', 'Uttar Pradesh', 'Bihar', 'Gujarat', 'Telangana', 'Meghalaya', 'Arunachal Pradesh', 'Maharashtra', 'Goa', 'West Bengal'];
         asort($list);
         $state_list = $list;
-        $cart_data = CartMaster::with('cart_item_list.product_list')->first();
+        $cart_data = CartMaster::with('cart_item_list.product_list')->where('cart_status', 1)->first();
         return view('page.checkout', compact('cart_data','state_list'));
     }
     public function cart(){
-        $product_list = DB::table('dummy_products_details')->limit(4)->get();
-        $review_product = DB::table('dummy_review as dnl')->select('review_id','review','review_rating')->join('dummy_products_details as dpd','dpd.id','=','dnl.prod_id')->get();
-        $cart_data = CartMaster::with('cart_item_list.product_list')->first();
+
+        // $catrt = CartMaster::with('cart_item_list.product_list.product_colors.colors')->findorfail(1);
+        // dd($catrt);
+        // $product_list = DB::table('dummy_products_details')->limit(4)->get();
+        // $review_product = DB::table('dummy_review as dnl')->select('review_id','review','review_rating')->join('dummy_products_details as dpd','dpd.id','=','dnl.prod_id')->get();
+        $cart_data = CartMaster::with('cart_item_list.product_list')->where('cart_status',1)->first();
         // dd($cart_data);
-        $trand_product = DB::table('dummy_top_tranding as dtt')->select('product_name','product_rate','product_img')->join('dummy_products_details as dpd','dpd.id','=','dtt.product_id')->groupBy('dtt.product_id')->inRandomOrder()->limit(8)->get();
+        // $trand_product = DB::table('dummy_top_tranding as dtt')->select('product_name','product_rate','product_img')->join('dummy_products_details as dpd','dpd.id','=','dtt.product_id')->groupBy('dtt.product_id')->inRandomOrder()->limit(8)->get();
         return view('page.cart', compact('cart_data'));
     }
     
@@ -104,12 +118,13 @@ class PageController extends Controller
         $product = Product::findOrFail($request->input('product_id'));
         if(Auth::user()){
 
-            $cart_master = CartMaster::where('user_id', Auth::user()->id)->first();
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
             if($cart_master ==  null){
                 $cart_master =  new CartMaster;
                 $cart_master->user_id = Auth::user()->id;
                 $cart_master->session_id = Session::getId();
                 $cart_master->cart_master_id = Uuid::randomNumber();
+                $cart_master->cart_status = 1;
                 $cart_master->save();
             }
             
@@ -164,5 +179,99 @@ class PageController extends Controller
         $cart->save();
         $data['msg'] = 'successfully updated cart';
         return response()->json($data, 200);
+    }
+
+    public function checkoutpayment(Request $request){
+        $validator = Validator::make($request->all(), [
+            'bill_firstname' => 'required|string|max:50',
+            'bill_lastname' => 'nullable|string|max:50',
+            'bill_contactno' => 'required|numeric',
+            'bill_address_line1' => 'required|string|max:200',
+            'bill_address_line2' => 'nullable|string|max:200',
+            'bill_city' => 'required|string|max:50',
+            'bill_state' => 'required|string|max:50',
+            'bill_pincode' => 'required|numeric',
+            'cart_master_id' => 'required|numeric',
+            'payment' => 'required|in:gpay,paypal,banktransfer',
+            'gpay_ref_no'  => 'required_if:payment,==,gpay',
+            'paypal_ref_no'  => 'required_if:payment,==,paypal',
+            'banktransfer_ref_no'  => 'required_if:payment,==,banktransfer',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $cart_data = CartMaster::with('cart_item_list.product_list.product_colors.colors')->findorfail($request->cart_master_id);
+
+        $billing_address = $request->input('bill_firstname')."|".$request->input('bill_lastname')."|".$request->input('bill_contactno')."|".$request->input('bill_address_line1')."|".$request->input('bill_address_line2')."|".$request->input('bill_city')."|".$request->input('bill_state')."|".$request->input('bill_pincode');
+
+        $orderMaster = new OrderMaster();
+        $order_master_id = Uuid::randomNumber();
+        $orderMaster->order_master_id = $order_master_id;
+        $orderMaster->cart_id = $cart_data->id;
+        $orderMaster->user_id = Auth::user()->id;
+        $orderMaster->order_date = date("Y-m-d");
+        $orderMaster->sub_total = 4.5;
+        $orderMaster->other_amt = 4.5;
+        $orderMaster->total_amt = 4.5;
+        $orderMaster->payment_status = 1;
+        $orderMaster->payment_mode = $request->input('payment');
+        $orderMaster->payment_reference_no = $request->input('gpay_ref_no');
+        $orderMaster->order_status = 1;
+        $orderMaster->billing_details = $billing_address;
+        $orderMaster->save();
+
+        $orderMasterID = $orderMaster->id;
+        $sub_total_overall = 0;
+        $total_amt_overall = 0;
+        foreach($cart_data->cart_item_list as $item_list){
+            
+            $sub_total = round($item_list->product_list->product_rate * $item_list->product_qty,2);
+            $total_amt = $sub_total;
+            
+            $color_name = 'default';
+            if(isset($item_list->product_list->product_color->color_name)){
+                $color_name = $item_list->product_list->product_color->color_name;
+            }
+
+            $orderItem = new OrderItem();
+            $orderItem->order_id = $orderMasterID;
+            $orderItem->order_master_id = $order_master_id;
+            $orderItem->user_id = Auth::user()->id;
+            $orderItem->product_name = $item_list->product_list->product_name;
+            $orderItem->color_name = $color_name;
+            $orderItem->product_qty = $item_list->product_qty;
+            $orderItem->product_mrp = $item_list->product_list->product_mrp;
+            $orderItem->product_rate = $item_list->product_list->product_rate;
+            $orderItem->sub_total = $sub_total;
+            $orderItem->discount_amt = 0;
+            $orderItem->gst_per = 0;
+            $orderItem->gst_amt = 0;
+            $orderItem->total_amt = $total_amt;
+            $orderItem->save();
+
+            $sub_total_overall += $sub_total;
+            $total_amt_overall += $total_amt;
+        }
+
+        $valid = OrderMaster::where('id',$orderMaster->id)->update(['sub_total'=> $sub_total_overall, 'total_amt'=>$total_amt_overall]);
+
+        if($valid){
+            CartMaster::where('id', $cart_data->id)->update(['cart_status'=>2]);
+            return redirect()->route('thankyou')->with('success','suscccsglll');
+        }else{
+            return redirect()->route('thankyou')->with('failed','failed');
+        }
+        
+    }
+
+    public function thankyou(){
+        if(Session::has('success') || Session::has('failed')){
+            return view('page.thankyou');
+        }else{
+            return redirect()->route('home');
+        }
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('user_id')->nullable();
             $table->string('session_id',250)->nullable();
             $table->string('cart_master_id',100);
+            $table->tinyInteger('cart_status')->default(1); // (0)inactive (1)inprogress (2)checkout
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });

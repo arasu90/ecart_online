@@ -1,6 +1,6 @@
 <x-guest-layout>
-     <!-- Cart Start -->
-     <div class="container-fluid pt-5">
+    <!-- Cart Start -->
+    <div class="container-fluid pt-5">
         <div class="row px-xl-5">
             <div class="col-lg-8 table-responsive mb-5">
                 <table class="table table-bordered text-center mb-0">
@@ -18,7 +18,8 @@
                         $subtotal=0;
                         $shipping=10;
                         @endphp
-                        @foreach($cart_data->cart_item_list as $cart)
+                        @if(isset($cart_data->cart_item_list))
+                        @forelse($cart_data->cart_item_list as $cart)
                         <tr id="row_id_{{$loop->index}}">
                             <td class="align-middle"><x-img-tag img_url="img/product-1.jpg" style="width: 50px;" />{{$cart->product_list->product_name}}</td>
                             <td class="align-middle">$ <span class="product_ratetxt_{{$loop->index}}">{{$cart->product_list->product_rate}}</span><input type="hidden" name="product_rate[]" class="product_rate_{{$loop->index}}" value="{{$cart->product_list->product_rate}}"></td>
@@ -26,8 +27,8 @@
                             <td class="align-middle">
                                 <div class="input-group quantity mx-auto" style="width: 100px;">
                                     <div class="input-group-btn">
-                                        <button data-rowid="{{$loop->index}}" class="btn btn-sm btn-primary btn-minus product_qty" >
-                                        <i class="fa fa-minus"></i>
+                                        <button data-rowid="{{$loop->index}}" class="btn btn-sm btn-primary btn-minus product_qty">
+                                            <i class="fa fa-minus"></i>
                                         </button>
                                     </div>
                                     <input type="text" class="form-control form-control-sm bg-secondary text-center product_qty_{{$loop->index}}" value="{{$cart->product_qty}}" readonly name="product_qty[]" id="product_qty_{{$loop->index}}">
@@ -44,7 +45,12 @@
                         @php
                         $subtotal += ($cart->product_list->product_rate*$cart->product_qty);
                         @endphp
-                        @endforeach
+                        @empty
+                        <p>No data</p>
+                        @endforelse
+                        @else
+                        <tr><td colspan="5">No data</td></tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -74,10 +80,14 @@
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">$<span id="spantotoalamt" >{{ number_format($subtotal + $shipping,2)}}</span></h5>
+                            <h5 class="font-weight-bold">$<span id="spantotoalamt">{{ number_format($subtotal + $shipping,2)}}</span></h5>
                         </div>
                         @auth
+                        @if(isset($cart_data->cart_item_list))
                         <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
+                        @else
+                        <a href="{{route('home')}}" class="btn btn-block btn-primary my-3 py-3">Countiue to Shooping</a>
+                        @endif
                         @else
                         <!-- <a href="{{route('login')}}" class="btn btn-block btn-primary my-3 py-3" >Login to Proceed</a> -->
                         <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
@@ -88,35 +98,35 @@
         </div>
     </div>
     <!-- Cart End -->
-     @push('scripts')
-     <script>
+    @push('scripts')
+    <script>
         $(document).ready(function() {
-            $('.product_qty').on('click', function(){
+            $('.product_qty').on('click', function() {
                 var rowid = $(this).data('rowid');
-                var product_qty = parseFloat($('.product_qty_'+rowid).val());
-                var product_rate = parseFloat($('.product_rate_'+rowid).val());
+                var product_qty = parseFloat($('.product_qty_' + rowid).val());
+                var product_rate = parseFloat($('.product_rate_' + rowid).val());
                 var product_value = parseFloat(product_qty * product_rate).toFixed(2);
-                $('.product_value_'+rowid).text(product_value);
+                $('.product_value_' + rowid).text(product_value);
                 getsubtotal();
                 console.log(rowid);
                 updatecart(rowid);
             });
 
-            function getsubtotal(){
-                spansubamt=0;
-                $('.productlist').each(function(i){
+            function getsubtotal() {
+                spansubamt = 0;
+                $('.productlist').each(function(i) {
                     subamt = $(this).text();
-                    if(!isNaN(subamt)) spansubamt += Number(subamt);
+                    if (!isNaN(subamt)) spansubamt += Number(subamt);
                 });
 
                 shippingamt = parseFloat($('#spanshippingamt').text());
-                
+
                 $("#spansubamt").text(spansubamt.toFixed(2));
                 // $("#spanshippingamt").text(shippingamt);
-                $("#spantotoalamt").text((shippingamt+spansubamt).toFixed(2));
+                $("#spantotoalamt").text((shippingamt + spansubamt).toFixed(2));
             }
 
-            $(".removecart").on('click', function(){
+            $(".removecart").on('click', function() {
                 var cartid = $(this).data('del_id');
                 var row_id = $(this).data('row_id');
                 // $("#row_id_"+row_id).remove();
@@ -127,47 +137,47 @@
                         'cart_id': cartid,
                     },
                     dataType: 'JSON',
-                    "headers": {'X-CSRF-TOKEN':'{{ csrf_token() }}'},
-                    success:function(response)
-                    {
-                        $("#row_id_"+row_id).remove();
+                    "headers": {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        $("#row_id_" + row_id).remove();
                         getsubtotal();
                     },
-                    error: function(response)
-                    {
+                    error: function(response) {
                         console.log(response);
                     }
                 });
             });
 
-           function updatecart(rowid){
-            // console.log(rowid);
-            var cartid = $("#cart_id_"+rowid).val();
-            // console.log(cartid);
-                var prod_qty = $("#product_qty_"+rowid).val();
-                if(prod_qty > 0){
-                $.ajax({
-                    url: '{{route("updatecart")}}',
-                    method: 'POST',
-                    data: {
-                        'cart_id': cartid,
-                        "prod_qty": prod_qty
-                    },
-                    dataType: 'JSON',
-                    "headers": {'X-CSRF-TOKEN':'{{ csrf_token() }}'},
-                    success:function(response)
-                    {
-                        $("#row_id_"+row_id).remove();
-                        getsubtotal();
-                    },
-                    error: function(response)
-                    {
-                        console.log(response);
-                    }
-                });
+            function updatecart(rowid) {
+                // console.log(rowid);
+                var cartid = $("#cart_id_" + rowid).val();
+                // console.log(cartid);
+                var prod_qty = $("#product_qty_" + rowid).val();
+                if (prod_qty > 0) {
+                    $.ajax({
+                        url: '{{route("updatecart")}}',
+                        method: 'POST',
+                        data: {
+                            'cart_id': cartid,
+                            "prod_qty": prod_qty
+                        },
+                        dataType: 'JSON',
+                        "headers": {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $("#row_id_" + row_id).remove();
+                            getsubtotal();
+                        },
+                        error: function(response) {
+                            console.log(response);
+                        }
+                    });
+                }
             }
-        }
         });
     </script>
-     @endpush
+    @endpush
 </x-guest-layout>

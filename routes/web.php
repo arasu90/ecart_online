@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('checkout');
+Route::post('/checkoutpayment', [PageController::class, 'checkoutpayment'])->middleware(['auth', 'verified'])->name('checkoutpayment');
+Route::get('/thankyou', [PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('thankyou');
 
 // Route::get('checkout', function () {
 // return 'check out page before login';
