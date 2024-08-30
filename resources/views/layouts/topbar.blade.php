@@ -26,9 +26,9 @@
                 </a>
                 <a href="{{route('cart')}}" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge"><span id="cart_count">
-                    @if(Session::has('cart'))
-                        {{ Session::get('cart') }}
+                    <span class="badge"><span id="shoppingcart_count">
+                    @if(Session::has('cart_count'))
+                        {{ Session::get('cart_count') }}
                         @else
                         0
                     @endif

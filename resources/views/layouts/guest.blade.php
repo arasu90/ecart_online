@@ -32,6 +32,12 @@
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <!-- <link href="{{ asset('css/custom.css') }}" rel="stylesheet"> -->
+     <style>
+        .product-img{
+            width : 392px !important;
+            height: 392px !important;
+        }
+     </style>
 </head>
 
 <body>
@@ -62,67 +68,73 @@
     <script src="{{ asset('js/main.js') }}"></script>
     @stack('scripts')
     <script type="text/javascript">
-        const current = document.getElementById("current");
-        const opacity = 0.6;
-        const imgs = document.querySelectorAll(".img");
-        imgs.forEach(img => {
-            img.addEventListener("click", (e) => {
-                //reset opacity
-                imgs.forEach(img => {
-                    img.style.opacity = 1;
-                });
-                current.src = e.target.src;
-                //adding class 
-                //current.classList.add("fade-in");
-                //opacity
-                e.target.style.opacity = opacity;
-            });
-        });
 
-        function addtocart(id){
+        $(".shoppingcart").on('click', function(e){
+            var prod_id = $(this).data('prod_id');
+            var cart_type = $(this).data('cart_type');
+            if(cart_type == 'add'){
+                addtocart(prod_id);
+                // $(this).html('<i class="fas fa-shopping-cart text-primary mr-1"></i><span class="text-primary">Remove to Cart</span>');
+                $(this).data('cart_type','remove');
+                var text_color = 'text-primary';
+                if($(this).hasClass('btn-primary')){
+                    console.log('product page');
+                    text_color = 'text-white';
+                }
+                $('.shoppingcartbtn_'+prod_id).html('<i class="fas fa-shopping-cart '+text_color+' mr-1"></i><span class="'+text_color+'">Remove Cart</span>');
+            }else if(cart_type == 'remove'){
+                removetocart(prod_id);
+                // $(this).html('<i class="fas fa-shopping-cart text-primary mr-1"></i><span class="">Add to Cart</span>');
+                $(this).data('cart_type','add');
+                var text_color = 'text-primary';
+                if($(this).hasClass('btn-primary')){
+                    console.log('product page');
+                    text_color = '';
+                }
+                $('.shoppingcartbtn_'+prod_id).html('<i class="fas fa-shopping-cart '+text_color+'  mr-1"></i><span class="">Add to Cart</span>');
+            }else{
+                console.log('error on cart add product');
+            }
+        });
+        function removetocart(product_id){
+            $.ajax({
+                    url: '{{route("removetocart")}}',
+                    method: 'POST',
+                    data: {
+                        'product_id': product_id,
+                    },
+                    dataType: 'JSON',
+                    "headers": {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        var cart_count = response.cartcount;
+                        $('#shoppingcart_count').text(cart_count);
+                    },
+                    error: function(response) {
+                        console.log(response);
+                    }
+                });
+        }
+        function addtocart(product_id){
 
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
-
-            var product_id = id;
-            var quantity = "1";
-
+            
             $.ajax({
                 url: '{{route("addtocart")}}',
                 method: "POST",
                 data: {
-                    'quantity': quantity,
                     'product_id': product_id,
                 },
                 success: function (response) {
                     var cart_count = response.cartcount;
-                    $('#cart_count').text(cart_count);
+                    $('#shoppingcart_count').text(cart_count);
                 },
             });
-
-        /* $.ajax({
-            url: '{{route("addtocart")}}',
-            method: 'POST',
-            data: {
-                'product_id':'3',
-            },
-            dataType: 'JSON',
-            "headers": {'X-CSRF-TOKEN':'{{ csrf_token() }}'},
-            contentType: false,
-            cache: false,
-            processData: false,
-            success:function(response)
-            {
-               console.log(response);
-            },
-            error: function(response)
-            {
-                console.log(response);    
-            }
-        }); */
         }
     </script>
 

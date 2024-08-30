@@ -82,7 +82,8 @@
                                     @php
                                     $subtotal = 0;
                                     @endphp
-                                    @foreach($cart_data->cart_item_list as $cart)
+                                    @foreach($cart_data as $cart_data_list)
+                                    @foreach($cart_data_list->cart_item_list as $cart)
                                     <div class="d-flex justify-content-between">
                                         <p>{{$cart->product_list->product_name}} <br /><small>({{$cart->product_qty}} * {{$cart->product_list->product_rate}})</small></p>
                                         <p>{{ number_format($cart->product_qty * $cart->product_list->product_rate,2)}}</p>
@@ -90,6 +91,7 @@
                                     @php
                                     $subtotal += $cart->product_qty * $cart->product_list->product_rate;
                                     @endphp
+                                    @endforeach
                                     @endforeach
                                     <hr class="mt-0">
                                     <div class="d-flex justify-content-between mb-3 pt-1">
@@ -105,7 +107,7 @@
                                     <div class="d-flex justify-content-between mt-2">
                                         <h5 class="font-weight-bold">Total</h5>
                                         <h5 class="font-weight-bold">${{number_format($subtotal+10,2)}}</h5>
-                                        <input type="hidden" name="cart_master_id" id="cart_master_id" value="{{$cart_data->id}}">
+                                        <input type="hidden" name="cart_master_id" id="cart_master_id" value="{{$cart_data_list->id}}">
                                     </div>
                                 </div>
                             </div>
@@ -196,7 +198,7 @@
                         <div class="">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" id="banktransfer" required value="banktransfer" {{ (old('payment') == 'banktransfer') ? 'checked' : ''}}>
-                                <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
+                                <label class="custom-control-label" for="banktransfer">Bank Transfer/Net Banking</label>
                             </div>
                         </div>
                         @error('bill_address_line2')
@@ -208,7 +210,7 @@
                         <div class="form-group gpaydiv" {{ (old('payment') == 'gpay') ? '' : 'style=display:none;' }} >
                             <label for=""><strong>Gpay</strong></label>
                             <p>Scan and Pay this QR Code and enter the reference no</p>
-                            <x-img-tag img_url="img/product-1.jpg" class="w-100" />
+                            <x-img-tag img_url="img/gpay_scanner.jpeg" class="w-80" />
                             <label for="gpay_ref_no">Reference No <span class="text-danger">*</span></label>
                             <input type="text" name="gpay_ref_no" id="gpay_ref_no" value="{{old('gpay_ref_no')}}"class="form-control">
                             @error('gpay_ref_no')

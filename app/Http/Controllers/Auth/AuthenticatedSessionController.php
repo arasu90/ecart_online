@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\CartMaster;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
@@ -18,7 +21,6 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-
         return view('auth.login');
     }
 
@@ -59,9 +61,17 @@ class AuthenticatedSessionController extends Controller
             'password' => 'required',
         ]);
         
+        $cart_master_data = CartMaster::where('session_id',Session::getId())->where('cart_status',1)->first();
         // check if the given user exists in db
         if(Auth::attempt(['email'=> $input['email'], 'password'=> $input['password']])){
+            // DB::enableQueryLog();
+            if($cart_master_data != null){
+                CartMaster::where('session_id',$cart_master_data->session_id)->where('cart_status',1)->update(['user_id'=>Auth::user()->id]);
+            }
+            // $daaa = DB::getquerylog();
+            // dd($daaa);
             // check the user role
+            // dd($getid." get id .....tGTWaqZsJWk0bZRC9aVCIvhnrnTlasAqG4tNWDVO old id ".Session::getId(). "new session id");
             if (Auth::user()->type == 'admin') {
                 return redirect()->route('adminDashboardShow');
             }

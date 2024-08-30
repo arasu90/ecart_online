@@ -3,7 +3,7 @@
     <div class="container-fluid pt-5">
         <div class="row px-xl-5">
             <div class="col-lg-8 table-responsive mb-5">
-                <table class="table table-bordered text-center mb-0">
+                <table class="table table-bordered text-center mb-0" id="carttable">
                     <thead class="bg-secondary text-dark">
                         <tr>
                             <th>Products</th>
@@ -18,12 +18,12 @@
                         $subtotal=0;
                         $shipping=10;
                         @endphp
-                        @if(isset($cart_data->cart_item_list))
-                        @forelse($cart_data->cart_item_list as $cart)
+                        
+                        @forelse($cart_data as $cart)
                         <tr id="row_id_{{$loop->index}}">
-                            <td class="align-middle"><x-img-tag img_url="img/product-1.jpg" style="width: 50px;" />{{$cart->product_list->product_name}}</td>
-                            <td class="align-middle">$ <span class="product_ratetxt_{{$loop->index}}">{{$cart->product_list->product_rate}}</span><input type="hidden" name="product_rate[]" class="product_rate_{{$loop->index}}" value="{{$cart->product_list->product_rate}}"></td>
-                            <input type="hidden" name="cart_id" id="cart_id_{{$loop->index}}" value="{{$cart->id}}">
+                            <td class="align-middle"><x-img-tag img_url="{{$cart['image_name']}}" style="width: 50px;" />{{$cart['product_name']}}</td>
+                            <td class="align-middle">Rs.<span class="product_ratetxt_{{$loop->index}}">{{$cart['product_rate']}}</span><input type="hidden" name="product_rate[]" class="product_rate_{{$loop->index}}" value="{{$cart['product_rate']}}"></td>
+                            <input type="hidden" name="cart_id" id="cart_id_{{$loop->index}}" value="{{$cart['cart_id']}}">
                             <td class="align-middle">
                                 <div class="input-group quantity mx-auto" style="width: 100px;">
                                     <div class="input-group-btn">
@@ -31,7 +31,7 @@
                                             <i class="fa fa-minus"></i>
                                         </button>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center product_qty_{{$loop->index}}" value="{{$cart->product_qty}}" readonly name="product_qty[]" id="product_qty_{{$loop->index}}">
+                                    <input type="text" class="form-control form-control-sm bg-secondary text-center product_qty_{{$loop->index}}" value="{{$cart['product_qty']}}" readonly name="product_qty[]" id="product_qty_{{$loop->index}}">
                                     <div class="input-group-btn">
                                         <button data-rowid="{{$loop->index}}" class="btn btn-sm btn-primary btn-plus product_qty">
                                             <i class="fa fa-plus"></i>
@@ -39,18 +39,16 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="align-middle">$ <span class="productlist product_value_{{$loop->index}}" id="product_value_{{$loop->index}}">{{ number_format($cart->product_list->product_rate * $cart->product_qty,2)}}</span></td>
-                            <td class="align-middle"><button data-del_id="{{$cart->id}}" data-row_id="{{$loop->index}}" class="btn btn-sm btn-primary removecart"><i class="fa fa-times"></i></button></td>
+                            <td class="align-middle">Rs.<span class="productlist product_value_{{$loop->index}}" id="product_value_{{$loop->index}}">{{ number_format($cart['product_rate'] * $cart['product_qty'], 2, '.', '')}}</span></td>
+                            <td class="align-middle"><button data-del_id="{{$cart['cart_id']}}" data-row_id="{{$loop->index}}" class="btn btn-sm btn-primary removecart"><i class="fa fa-times"></i></button></td>
                         </tr>
                         @php
-                        $subtotal += ($cart->product_list->product_rate*$cart->product_qty);
+                        $subtotal += ($cart['product_rate']*$cart['product_qty']);
                         @endphp
                         @empty
-                        <p>No data</p>
+                        <tr><td colspan="5">Your Cart is Empty</td></tr>
                         @endforelse
-                        @else
-                        <tr><td colspan="5">No data</td></tr>
-                        @endif
+                        
                     </tbody>
                 </table>
             </div>
@@ -70,20 +68,20 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium">$<span id="spansubamt">{{number_format($subtotal,2)}}</span></h6>
+                            <h6 class="font-weight-medium">Rs.<span id="spansubamt">{{number_format($subtotal,2)}}</span></h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$<span id="spanshippingamt">{{number_format($shipping,2)}}</span></h6>
+                            <h6 class="font-weight-medium">Rs.<span id="spanshippingamt">{{number_format($shipping,2)}}</span></h6>
                         </div>
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">$<span id="spantotoalamt">{{ number_format($subtotal + $shipping,2)}}</span></h5>
+                            <h5 class="font-weight-bold">Rs.<span id="spantotoalamt">{{ number_format($subtotal + $shipping,2)}}</span></h5>
                         </div>
                         @auth
-                        @if(isset($cart_data->cart_item_list))
+                        @if(isset($cart_data))
                         <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
                         @else
                         <a href="{{route('home')}}" class="btn btn-block btn-primary my-3 py-3">Countiue to Shooping</a>
@@ -108,7 +106,7 @@
                 var product_value = parseFloat(product_qty * product_rate).toFixed(2);
                 $('.product_value_' + rowid).text(product_value);
                 getsubtotal();
-                console.log(rowid);
+                // console.log(rowid);
                 updatecart(rowid);
             });
 
@@ -127,30 +125,12 @@
             }
 
             $(".removecart").on('click', function() {
-                var cartid = $(this).data('del_id');
                 var row_id = $(this).data('row_id');
-                // $("#row_id_"+row_id).remove();
-                $.ajax({
-                    url: '{{route("removetocart")}}',
-                    method: 'POST',
-                    data: {
-                        'cart_id': cartid,
-                    },
-                    dataType: 'JSON',
-                    "headers": {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        $("#row_id_" + row_id).remove();
-                        getsubtotal();
-                    },
-                    error: function(response) {
-                        console.log(response);
-                    }
-                });
+                updatecart(row_id,'remove');
+                $("#row_id_" + row_id).remove();
             });
 
-            function updatecart(rowid) {
+            function updatecart(rowid, update_type='update') {
                 // console.log(rowid);
                 var cartid = $("#cart_id_" + rowid).val();
                 // console.log(cartid);
@@ -161,17 +141,24 @@
                         method: 'POST',
                         data: {
                             'cart_id': cartid,
-                            "prod_qty": prod_qty
+                            "prod_qty": prod_qty,
+                            "update_type": update_type
                         },
                         dataType: 'JSON',
                         "headers": {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         success: function(response) {
-                            $("#row_id_" + row_id).remove();
+                            $('#shoppingcart_count').text(response.cart_count);
+                            if(response.cart_count == 0){
+                                $("#carttable").append('<tr><td colspan="5">Your Cart is Empty</td></tr>');
+                            }
                             getsubtotal();
                         },
                         error: function(response) {
+                            if(response.status == 400){
+                                $("#row_id_" + rowid).remove();
+                            }
                             console.log(response);
                         }
                     });

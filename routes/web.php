@@ -46,6 +46,7 @@ Route::get('/cart', [PageController::class, 'cart'])->name('cart');
 Route::post('/savereview', [PageController::class, 'savereview'])->name('savereview');
 Route::post('/addtocart', [PageController::class, 'addtocart'])->name('addtocart');
 Route::post('/removetocart', [PageController::class, 'removetocart'])->name('removetocart');
+// Route::post('/removecart', [PageController::class, 'removecart'])->name('removecart');
 Route::post('/updatecart', [PageController::class, 'updatecart'])->name('updatecart');
 
 // routes/web.php

@@ -26,7 +26,7 @@
                     <x-rating-tag rating="{{ $averageRating }}" />
                     <small class="pt-1">({{ count($product_data->product_review) }} Reviews)</small>
                 </div>
-                <h3 class="font-weight-semi-bold mb-4">${{ number_format($product_data->product_rate,2) }} <del class="text-muted ml-2 small">${{ number_format($product_data->product_mrp,2) }}</del></h3>
+                <h3 class="font-weight-semi-bold mb-4">Rs.{{ number_format($product_data->product_rate,2) }} <del class="text-muted ml-2 small">Rs.{{ number_format($product_data->product_mrp,2) }}</del></h3>
                 <p class="mb-4">{{ $product_data->product_desc }}</p>
                 <!-- <div class="d-flex mb-3">
                     <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:</p>
@@ -65,7 +65,7 @@
                     </form>
                 </div>
                 <div class="d-flex align-items-center mb-4 pt-2">
-                    <div class="input-group quantity mr-3" style="width: 130px;">
+                    <!-- <div class="input-group quantity mr-3" style="width: 130px;">
                         <div class="input-group-btn">
                             <button class="btn btn-primary btn-minus">
                                 <i class="fa fa-minus"></i>
@@ -77,8 +77,15 @@
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
-                    </div>
-                    <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                    </div> -->
+                    <button data-prod_id="{{ $product_data->id }}" class="btn btn-primary px-3 shoppingcart shoppingcartbtn_{{ $product_data->id }}" data-cart_type="{{ $cart_status }}">
+                                <i class="fas fa-shopping-cart text-white mr-1"></i>
+                                @if($cart_status =='remove' )
+                                    <span class="text-white">Remove Cart</span>
+                                @else
+                                    Add To Cart
+                                @endif
+                            </button>
                 </div>
                 <!-- <div class="d-flex pt-2">
                     <p class="text-dark font-weight-medium mb-0 mr-2">Share on:</p>
@@ -177,7 +184,7 @@
                                     @csrf
                                     <div class="form-group">
                                         <label for="message">Your Review *</label>
-                                        <textarea name="review_comment" cols="30" rows="5" class="form-control" ></textarea>
+                                        <textarea name="review_comment" cols="30" rows="5" class="form-control"></textarea>
                                         <input type="hidden" value="{{$product_data->id}}" name="product_id" />
                                         @error('review_comment')
                                         <span class="text-danger" role="alert">{{ $message }}
@@ -194,7 +201,7 @@
                                     @endif
                                 </form>
                                 @else
-                                <small>Review your comment after login <a href="{{route('login')}}" class="link" >Click Here</a></small>
+                                <small>Review your comment after login <a href="{{route('login')}}" class="link">Click Here</a></small>
                                 @endif
                             </div>
                         </div>
@@ -216,19 +223,26 @@
                     @foreach($trand_product as $product)
                     <div class="card product-item border-0">
                         <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                            <a href="{{route('productdetail',$product->id)}}">
-                                <x-img-tag img_url="{{$product->defaultImg->image_name}}" class="w-100" /> </a>
+                            <a href="{{route('productdetail',$product['id']) }}">
+                                <x-img-tag img_url="{{$product['image_name'] }}" class="w-100" /> </a>
                         </div>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                            <h6 class="text-truncate mb-3">{{$product->product_name}}</h6>
+                            <h6 class="text-truncate mb-3">{{$product['product_name']}}</h6>
                             <div class="d-flex justify-content-center">
-                                <h6>${{$product->product_rate}}.00</h6>
-                                <h6 class="text-muted ml-2"><del>${{$product->product_rate}}.00</del></h6>
+                                <h6>Rs.{{$product['product_rate']}}</h6>
+                                <h6 class="text-muted ml-2"><del>Rs.{{$product['product_rate']}}</del></h6>
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between bg-light border">
-                            <a href="{{route('productdetail',$product->id)}}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
-                            <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
+                            <a href="{{route('productdetail',$product['id'])}}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                            <button data-prod_id="{{ $product['id'] }}" class="btn btn-sm text-dark p-0 shoppingcart shoppingcartbtn_{{ $product['id'] }}" data-cart_type="{{ $product['cart_type'] }}">
+                                <i class="fas fa-shopping-cart text-primary mr-1"></i>
+                                @if($product['cart_type'] =='remove' )
+                                    <span class="text-primary">Remove Cart</span>
+                                @else
+                                    Add To Cart
+                                @endif
+                            </button>
                         </div>
                     </div>
                     @endforeach
