@@ -48,11 +48,7 @@
                                     <td>{{ $list->product_mrp }}</td>
                                     <td>{{ $list->product_rate }}</td>
                                     <td>
-                                        @if($list->product_status == 1)
-                                        <span class="badge badge-secondary">Active</span>
-                                        @else
-                                        <span class="badge badge-danger">In Active</span>
-                                        @endif
+                                        <span class="badge {{ config('appstatus.productstatus.'.$list->product_status.'.color','badge-danger') }}">{{ config('appstatus.productstatus.'.$list->product_status.'.name','Inactive') }}</span>
                                     </td>
                                     <td>
                                         <div class="form-button-action">

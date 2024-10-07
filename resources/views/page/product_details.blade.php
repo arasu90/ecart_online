@@ -5,11 +5,15 @@
             <div class="col-lg-5 pb-5">
                 <div id="product-carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner border">
-                        @foreach($product_data->product_img as $key=>$product)
+                        @forelse($product_data->product_img as $key=>$product)
                         <div class="carousel-item {{ ($key==0) ? 'active' : '' }} ">
-                            <x-img-tag img_url="{{ $product->image_name }}" class="w-100 h-75" id="current" />
+                            <x-img-tag img_url="{{ $product->image_name }}" class="product_details" id="current" />
                         </div>
-                        @endforeach
+                        @empty
+                        <div class="carousel-item active">
+                            <x-img-tag img_url="img/default_image.jpg" class="product_details" id="current" />
+                        </div>
+                        @endforelse
                     </div>
                     <a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
                         <i class="fa fa-2x fa-angle-left text-dark"></i>
@@ -53,17 +57,19 @@
                         </div>
                     </form>
                 </div> -->
+                @if(count($product_data->product_colors))
                 <div class="d-flex mb-4">
                     <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
                     <form>
                         @foreach($product_data->product_colors as $key=>$color_data)
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="color-{{$key}}" name="color" value="{{ $color_data->colors->id }}">
+                            <input type="radio" class="custom-control-input" {{ ($key=='0') ? 'checked' : ' ' }} id="color-{{$key}}" name="color" value="{{ $color_data->colors->id }}">
                             <label class="custom-control-label" for="color-{{$key}}">{{ $color_data->colors->color_name}}</label>
                         </div>
                         @endforeach
                     </form>
                 </div>
+                @endif
                 <div class="d-flex align-items-center mb-4 pt-2">
                     <!-- <div class="input-group quantity mr-3" style="width: 130px;">
                         <div class="input-group-btn">
@@ -110,7 +116,7 @@
             <div class="col">
                 <div class="nav nav-tabs justify-content-center border-secondary mb-4">
                     <a class="nav-item nav-link active" data-toggle="tab" href="#tab-pane-1">Description</a>
-                    <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">Information</a>
+                    <!-- <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">Information</a> -->
                     <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">Reviews ({{ count($product_data->product_review) }})</a>
                 </div>
                 <div class="tab-content">
@@ -160,17 +166,21 @@
                         <div class="row">
                             <div class="col-md-6">
 
-                                <h4 class="mb-4">{{ count($product_data->product_review) }} review for "Colorful Stylish Shirt"</h4>
-                                @foreach($product_data->product_review as $review)
+                                <h4 class="mb-4">{{ count($product_data->product_review) }} Review </h4>
+                                @forelse($product_data->product_review as $review)
                                 <div class="media mb-4">
-                                    <img src="{{ asset('img/user.jpg') }}" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                    <img src="{{ asset('img/user2.png') }}" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
                                     <div class="media-body">
                                         <h6>{{ $review->users->name }}<small> - <i>{{ $review->created_at->format('d M Y'); }}</i></small></h6>
                                         <x-rating-tag rating="{{ $review->review_rating }}" />
                                         <p>{{ $review->review_comment }}</p>
                                     </div>
                                 </div>
-                                @endforeach
+                                @empty
+                                <div class="media mb-4">
+                                    Yet to review this product
+                                </div>
+                                @endforelse
                             </div>
                             <div class="col-md-6">
                                 <h4 class="mb-4">Leave a review</h4>
@@ -178,15 +188,20 @@
                                 <small>Your email address will not be published. Required fields are marked *</small>
                                 <div class="d-flex my-3">
                                     <p class="mb-0 mr-2">Your Rating * :</p>
-                                    <x-rating-tag rating="0" />
-                                </div>
-                                <form method="POST" action="{{ route('savereview') }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label for="message">Your Review *</label>
-                                        <textarea name="review_comment" cols="30" rows="5" class="form-control"></textarea>
-                                        <input type="hidden" value="{{$product_data->id}}" name="product_id" />
-                                        @error('review_comment')
+                                    <x-rating-tag rating="0" style="cursor:pointer" starclass="star"/>
+                                    @error('rating_val')
+                                    <span class="text-danger" role="alert">{{ $message }}
+                                        </span>
+                                        @enderror
+                                    </div>
+                                    <form method="POST" action="{{ route('savereview') }}">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="message">Your Review *</label>
+                                            <textarea name="review_comment" cols="30" rows="5" class="form-control"></textarea>
+                                            <input type="hidden" value="{{$product_data->id}}" name="product_id" />
+                                            <input type="hidden" name="rating_val" id="rating_val" value="0">
+                                            @error('review_comment')
                                         <span class="text-danger" role="alert">{{ $message }}
                                         </span>
                                         @enderror
@@ -222,10 +237,11 @@
                 <div class="owl-carousel related-carousel">
                     @foreach($trand_product as $product)
                     <div class="card product-item border-0">
-                        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                            <a href="{{route('productdetail',$product['id']) }}">
-                                <x-img-tag img_url="{{$product['image_name'] }}" class="w-100" /> </a>
-                        </div>
+                        <a href="{{route('productdetail',$product['id']) }}">
+                                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                <x-img-tag img_url="{{$product['image_name'] }}" class="w-100" />
+                            </div>
+                        </a>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                             <h6 class="text-truncate mb-3">{{$product['product_name']}}</h6>
                             <div class="d-flex justify-content-center">

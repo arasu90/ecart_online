@@ -52,9 +52,9 @@ class HomeBannerController extends Controller
             $banner->created_by = Auth::user()->id;
             $banner->save();
             
-            return back()->with('success', 'Product added and image uploaded successfully');
+            return back()->with('success', 'Banner Details and image uploaded successfully');
         }
-        return back()->with('error', 'Faild to upload');
+        return back()->with('error', 'Faild to Add');
     }
 
     /**

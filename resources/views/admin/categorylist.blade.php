@@ -50,11 +50,8 @@
 
                                     </td>
                                     <td>
-                                        @if($list->category_status == 1)
-                                        <span class="badge badge-secondary">Active</span>
-                                        @else
-                                        <span class="badge badge-danger">In Active</span>
-                                        @endif
+                                        <span class="badge {{ config('appstatus.categorystatus.'.$list->category_status.'.color','badge-danger') }}">{{ config('appstatus.categorystatus.'.$list->category_status.'.name','Inactive') }}</span>
+
                                     </td>
                                     <td>
                                         <div class="form-button-action">

@@ -275,7 +275,12 @@
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="#">Account Setting</a>
                       <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Logout</a>
+                      <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="{{route('logout')}}" class="dropdown-item" onclick="event.preventDefault();this.closest('form').submit();"> 
+                            <i class="fas fa-bed text-primary"></i>  {{ __('Log Out') }}
+                            </a>
+                        </form>
                     </li>
                   </div>
                 </ul>

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('category_name',50);
             $table->string('category_img',150)->nullable();
             $table->tinyInteger('category_status')->default(0);
+            $table->unsignedBigInteger('created_by');
+            $table->foreign('created_by')->references('id')->on('users');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 

@@ -16,15 +16,15 @@
                     <tbody class="align-middle">
                         @php
                         $subtotal=0;
-                        $shipping=10;
                         @endphp
                         
                         @forelse($cart_data as $cart)
                         <tr id="row_id_{{$loop->index}}">
-                            <td class="align-middle"><x-img-tag img_url="{{$cart['image_name']}}" style="width: 50px;" />{{$cart['product_name']}}</td>
-                            <td class="align-middle">Rs.<span class="product_ratetxt_{{$loop->index}}">{{$cart['product_rate']}}</span><input type="hidden" name="product_rate[]" class="product_rate_{{$loop->index}}" value="{{$cart['product_rate']}}"></td>
+                            <td class="align-middle" width="45%"><x-img-tag img_url="{{$cart['image_name']}}" style="width: 50px;" />
+                            <a href="{{route('productdetail',$cart['id'])}}" >{{$cart['product_name']}}</a></td>
+                            <td class="align-middle text-left" width="15%">Rs. <span class="product_ratetxt_{{$loop->index}}">{{$cart['product_rate']}}</span><input type="hidden" name="product_rate[]" class="product_rate_{{$loop->index}}" value="{{$cart['product_rate']}}"></td>
                             <input type="hidden" name="cart_id" id="cart_id_{{$loop->index}}" value="{{$cart['cart_id']}}">
-                            <td class="align-middle">
+                            <td class="align-middle" width="20%">
                                 <div class="input-group quantity mx-auto" style="width: 100px;">
                                     <div class="input-group-btn">
                                         <button data-rowid="{{$loop->index}}" class="btn btn-sm btn-primary btn-minus product_qty">
@@ -39,8 +39,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="align-middle">Rs.<span class="productlist product_value_{{$loop->index}}" id="product_value_{{$loop->index}}">{{ number_format($cart['product_rate'] * $cart['product_qty'], 2, '.', '')}}</span></td>
-                            <td class="align-middle"><button data-del_id="{{$cart['cart_id']}}" data-row_id="{{$loop->index}}" class="btn btn-sm btn-primary removecart"><i class="fa fa-times"></i></button></td>
+                            <td class="align-middle text-left" width="15%">Rs. <span class="productlist product_value_{{$loop->index}}" id="product_value_{{$loop->index}}">{{ number_format($cart['product_rate'] * $cart['product_qty'], 2, '.', '')}}</span></td>
+                            <td class="align-middle" width="5%"><button data-del_id="{{$cart['cart_id']}}" data-row_id="{{$loop->index}}" class="btn btn-sm btn-primary removecart"><i class="fa fa-times"></i></button></td>
                         </tr>
                         @php
                         $subtotal += ($cart['product_rate']*$cart['product_qty']);
@@ -48,7 +48,6 @@
                         @empty
                         <tr><td colspan="5">Your Cart is Empty</td></tr>
                         @endforelse
-                        
                     </tbody>
                 </table>
             </div>
@@ -61,6 +60,11 @@
                         </div>
                     </div>
                 </form> -->
+                @php
+                $summary_subtotal=$subtotal;
+                $summary_total=$subtotal;
+                $shipping_val=0;
+                @endphp
                 <div class="card border-secondary mb-5">
                     <div class="card-header bg-secondary border-0">
                         <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
@@ -68,27 +72,32 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium">Rs.<span id="spansubamt">{{number_format($subtotal,2)}}</span></h6>
+                            <h6 class="font-weight-medium">Rs.<span id="spansubamt">{{number_format($summary_subtotal,2)}}</span></h6>
                         </div>
+                        @foreach($cart_fees as $fees_data)
                         <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">Rs.<span id="spanshippingamt">{{number_format($shipping,2)}}</span></h6>
+                            <h6 class="font-weight-medium">{{$fees_data->fees_name}}</h6>
+                            <h6 class="font-weight-medium">Rs.<span id="spanshippingamt">{{number_format($fees_data->fees_value,2)}}</span></h6>
                         </div>
+                        @php
+                        $summary_total +=$fees_data->fees_value;
+                        @endphp
+                        @endforeach
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">Rs.<span id="spantotoalamt">{{ number_format($subtotal + $shipping,2)}}</span></h5>
+                            <h5 class="font-weight-bold">Rs.<span id="spantotoalamt">{{ number_format($summary_total,2)}}</span></h5>
                         </div>
                         @auth
-                        @if(isset($cart_data))
-                        <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
+                        @if(!empty($cart_data))
+                            <a href="{{route('checkout')}}" class="btn btn-block btn-primary text-white my-3 py-3">Proceed To Checkout</a>
                         @else
-                        <a href="{{route('home')}}" class="btn btn-block btn-primary my-3 py-3">Countiue to Shooping</a>
+                            <a href="{{route('home')}}" class="btn btn-block btn-primary my-3 py-3">Countiue to Shooping</a>
                         @endif
                         @else
-                        <!-- <a href="{{route('login')}}" class="btn btn-block btn-primary my-3 py-3" >Login to Proceed</a> -->
-                        <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
+                            <a href="{{route('login')}}" class="btn btn-block btn-primary my-3 py-3" >Login to Proceed</a>
+                        <!-- <a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a> -->
                         @endauth
                     </div>
                 </div>
@@ -117,7 +126,7 @@
                     if (!isNaN(subamt)) spansubamt += Number(subamt);
                 });
 
-                shippingamt = parseFloat($('#spanshippingamt').text());
+                shippingamt = parseFloat('{{$shipping_val}}');
 
                 $("#spansubamt").text(spansubamt.toFixed(2));
                 // $("#spanshippingamt").text(shippingamt);

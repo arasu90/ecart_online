@@ -16,8 +16,10 @@ return new class extends Migration
             $table->string('order_master_id',100);
             $table->bigInteger('cart_id');
             $table->bigInteger('user_id');
-            $table->dateTime('order_date')->nullable();
-            $table->dateTime('delivery_date')->nullable();
+            $table->bigInteger('total_order_qty')->default(0);
+            $table->datetime('order_date')->nullable();
+            $table->string('payment_mode',100)->nullable();
+            $table->string('payment_reference_no',150)->nullable();
             $table->text('billing_details')->nullable();
             $table->decimal('sub_total', total: 8, places: 2)->default(0);
             $table->decimal('other_amt', total: 8, places: 2)->default(0);

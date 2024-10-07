@@ -89,3 +89,20 @@ AuthenticatedSessionController.php file added new custom function for login
 
 - **[Resize uploaded image file]**
 composer require intervention/image
+
+
+color replaced from to 
+
+#c5837c - #15b951d1
+
+#D19C97 - #119f45
+
+#c17a74 - #28a745
+
+#bd726b - #1e7e34
+
+rgba(209, 156, 151, 0.5) - rgba(90, 199, 77, 0.5)
+
+#ba6a62 - #17aa21
+
+rgba(183, 138, 135, 0.5) - rgba(135, 183, 154, 0.5)

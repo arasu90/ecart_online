@@ -42,7 +42,7 @@ class ProductController extends Controller
             'product_name' => 'required|string',
             'product_mrp' => 'required|numeric',
             'product_rate' => 'required|numeric',
-            'product_desc' => 'nullable|string|max:250',
+            'product_desc' => 'nullable|string',
             'product_detail' => 'nullable|string',
             'product_img_1' => 'required|file|mimes:jpeg,jpg,png|max:1000',
             'product_img_2' => 'nullable|file|mimes:jpeg,jpg,png|max:1000',
@@ -50,6 +50,7 @@ class ProductController extends Controller
             'product_img_4' => 'nullable|file|mimes:jpeg,jpg,png|max:1000',
             'product_img_5' => 'nullable|file|mimes:jpeg,jpg,png|max:1000',
         ]);
+        // dd($validator->errors());
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)

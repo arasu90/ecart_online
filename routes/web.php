@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('checkout');
 Route::post('/checkoutpayment', [PageController::class, 'checkoutpayment'])->middleware(['auth', 'verified'])->name('checkoutpayment');
 Route::get('/thankyou', [PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('thankyou');
+Route::get('/myorderlist', [PageController::class, 'myorderlist'])->middleware(['auth', 'verified'])->name('myorderlist');
 
 // Route::get('checkout', function () {
 // return 'check out page before login';
@@ -25,6 +26,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
+    Route::post('/myaddress', [PageController::class, 'myaddressAdd'])->name('profile.addmyaddress');
+    Route::patch('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
+    Route::delete('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
 });
 
 require __DIR__.'/auth.php';
@@ -61,6 +66,9 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
     Route::get('/homebanner', [HomeBannerController::class, 'homeBanner'])->name('homebanner');
     Route::delete('/homebanner/{id}', [HomeBannerController::class, 'deletebanner'])->name('deletebanner');
     Route::post('/savehomebanner', [HomeBannerController::class, 'store'])->name('savehomebanner');
+    Route::get('/feesdetails', [AdminPageController::class, 'feesdetails'])->name('feesdetails');
+    Route::delete('/feesdetails/{id}', [AdminPageController::class, 'deletefeesdetails'])->name('deletefeesdetails');
+    Route::post('/savefeesdetails', [AdminPageController::class, 'savefeesdetails'])->name('savefeesdetails');
     Route::prefix('category')->group(function(){
         Route::get('/', [AdminPageController::class, 'list'])->name('admincategory');
         Route::get('/new', [AdminPageController::class, 'create'])->name('newcategory');
@@ -82,5 +90,19 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
         Route::get('/edit/{id}', [BrandController::class, 'edit'])->name('editbrand');
         Route::post('/update/{id}', [BrandController::class, 'update'])->name('updatebrand');
     });
+    Route::prefix('order')->group(function(){
+        Route::get('/', [AdminPageController::class, 'orderlist'])->name('orderlist');
+        Route::get('/new', [BrandController::class, 'create'])->name('newbrand');
+        Route::post('/store', [BrandController::class, 'store'])->name('savebrand');
+        Route::get('/edit/{id}', [AdminPageController::class, 'orderedit'])->name('editorder');
+        Route::post('/update/{id}', [AdminPageController::class, 'orderItemUpdate'])->name('updateorderitem');
+    });
+    
+    Route::get('/users', [AdminPageController::class, 'userlist'])->name('userlist');
+    Route::get('/edituser/{id}', [AdminPageController::class, 'useredit'])->name('useredit');
+
+    Route::get('/website', [AdminPageController::class, 'websitedata'])->name('website');
+    Route::delete('/website/{id}', [AdminPageController::class, 'deletewebsite'])->name('deletewebsite');
+    Route::post('/savewebsite', [AdminPageController::class, 'savewebsite'])->name('savewebsite');
     
 });

@@ -33,9 +33,24 @@
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <!-- <link href="{{ asset('css/custom.css') }}" rel="stylesheet"> -->
      <style>
+        .logo {
+    width: 150px; /* Adjust as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
         .product-img{
-            width : 392px !important;
-            height: 392px !important;
+            width : 100% !important;
+            height: 250px !important;
+        }
+
+        .product-img-286{
+            width : 286px !important;
+            height: 286px !important;
+        }
+
+        .product_details{
+            width : 675px !important;
+            height: 675px !important;
         }
      </style>
 </head>
@@ -136,6 +151,53 @@
                 },
             });
         }
+
+       // script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('.star');
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', () => {
+            const value = star.getAttribute('data-value');
+            // console.log(value);
+            updateStars(value);
+        });
+
+        star.addEventListener('mouseout', () => {
+            updateStars(selectedRating);
+        });
+
+        star.addEventListener('click', () => {
+            selectedRating = star.getAttribute('data-value');
+            $("#rating_val").val(selectedRating);
+            updateStars(selectedRating);
+        });
+    });
+
+    function updateStars(rating) {
+        // console.log('rating var '+rating);
+        stars.forEach(star => {
+            var value = star.getAttribute('data-value');
+            // console.log('rating var '+rating +' valeu '+value);
+            if (value <= rating) {
+                // console.log('class added');
+                // $(star).addClass('far fa-star');
+                // $(star).removeClass('fas fa-star');
+                star.classList.add('fas');
+                star.classList.remove('far');
+            } else {
+                // console.log('class removed');
+                // $(star).classList('fas fa-star');
+                // $(star).removeClass('far fa-star');
+                star.classList.remove('fas');
+                star.classList.add('far');
+            }
+        });
+    }
+});
+
+
     </script>
 
 </body>

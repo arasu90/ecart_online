@@ -9,6 +9,7 @@
         "intervention/image": "^3.8",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "razorpay/razorpay": "^2.9",
         "spatie/image": "^3.7"
     },
     "require-dev": {
@@ -25,12 +26,18 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "app/Helpers/helpers.php"
+        ]
     },
     "scripts": {
         "post-autoload-dump": [

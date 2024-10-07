@@ -14,7 +14,6 @@
                             {{ Session::get('success') }}
                         </span>
                         @endif
-                        <a href="{{route('productlist')}}" class="btn btn-sm btn-warning pull-right">List</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -42,7 +41,7 @@
                                         id="banner_desc"
                                         name="banner_desc"
                                         placeholder="Enter Banner Desc" value="{{old('banner_desc') }}" />
-                                    @error('product_name')
+                                    @error('banner_desc')
                                     <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>

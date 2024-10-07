@@ -67,13 +67,18 @@
             <div class="col-lg-4 col-md-6 pb-1">
                 <div class="cat-item d-flex flex-column border mb-4" style="padding: 30px;">
                     <p class="text-right">{{$category->category_to->count()}} Products</p>
-                    <a href="{{route('product')}}" class="cat-img position-relative overflow-hidden mb-3">
-                        <x-img-tag img_url="{{$category->category_img}}" />
+                    <a href="{{route('product',['category'=>$category->id])}}" class="cat-img position-relative overflow-hidden mb-3">
+                        <x-img-tag img_url="{{$category->category_img}}" style="width:100%; height:20em !important"/>
                     </a>
                     <h5 class="font-weight-semi-bold m-0">{{$category->category_name}}</h5>
                 </div>
             </div>
             @endforeach
+            <div class="col-lg-12 col-md-12 col-sm-12 pb-1">
+                <div class='text-right'>
+                    <a href="{{ route('product') }}">View More</a>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Categories End -->
@@ -89,11 +94,11 @@
             <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
             <!-- <div class="col-lg-12 col-md-12 col-sm-12 pb-1"> -->
                 <div class="card product-item border-0 mb-4">
-                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                     <a href="{{route('productdetail',$product['id'])}}" >
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                         <x-img-tag img_url="{{ $product['image_name'] }}" class="w-100" />
-                    </a>
                     </div>
+                </a>
                     <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                         <h6 class="text-truncate mb-3">{{ $product['product_name'] }}</h6>
                         <div class="d-flex justify-content-center">
@@ -115,6 +120,11 @@
                 </div>
             </div>
             @endforeach
+            <div class="col-lg-12 col-md-12 col-sm-12 pb-1">
+                <div class='text-right'>
+                    <a href="{{ route('product') }}">View More</a>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Products End -->
@@ -128,11 +138,11 @@
             @foreach($new_product as $product)
             <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
                 <div class="card product-item border-0 mb-4">
-                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                     <a href="{{route('productdetail',$product['id'])}}" >
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                         <x-img-tag img_url="{{ $product['image_name'] }}" class="w-100" />
-                    </a>
                     </div>
+                </a>
                     <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                         <h6 class="text-truncate mb-3">{{ $product['product_name'] }}</h6>
                         <div class="d-flex justify-content-center">
@@ -154,6 +164,11 @@
                 </div>
             </div>
             @endforeach
+            <div class="col-lg-12 col-md-12 col-sm-12 pb-1">
+                <div class='text-right'>
+                    <a href="{{ route('product') }}">View More</a>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Products End -->

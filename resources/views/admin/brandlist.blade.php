@@ -46,15 +46,11 @@
                                     <td>{{ $list->brand_name }}</td>
                                     <td>
 
-                                        <x-img-tag img_url="{{ $list->brand_img }}" class="imagecheck-image w-25" />
+                                        <x-img-tag img_url="{{ $list->brand_img }}" class="imagecheck-image w-50" style="height: 15em !important" />
 
                                     </td>
                                     <td>
-                                        @if($list->brand_status == 1)
-                                        <span class="badge badge-secondary">Active</span>
-                                        @else
-                                        <span class="badge badge-danger">In Active</span>
-                                        @endif
+                                        <span class="badge {{ config('appstatus.brandstatus.'.$list->brand_status.'.color','badge-danger') }}">{{ config('appstatus.brandstatus.'.$list->brand_status.'.name','Inactive') }}</span>
                                     </td>
                                     <td>
                                         <div class="form-button-action">

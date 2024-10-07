@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartFee;
 use App\Models\CartItem;
 use App\Models\CartMaster;
 use App\Models\Category;
 use App\Models\HomeBanner;
+use App\Models\MyAddress;
 use App\Models\OrderItem;
 use App\Models\OrderMaster;
 use App\Models\Product;
 use App\Models\ProductReview;
-use Exception;
 use Faker\Provider\Uuid;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,7 +30,7 @@ class PageController extends Controller
     {
         if (Auth::user()) {
             $this->getcartcount();
-        }else{
+        } else {
             $this->cookiefunction();
         }
         session(['cart_count' => $this->cart_count]);
@@ -49,29 +50,23 @@ class PageController extends Controller
 
         $banner_data = HomeBanner::get();
         $brand_list = DB::table('dummy_brand')->get();
+        // $brand_list = '';
         $trand_product = $this->getTrandProduct();
         // dd($trand_product);
         $new_product = $this->getNewProduct();
-        $product_category = Category::where('category_status', 1)->inRandomOrder()->limit(6)->get();
+        $product_category = Category::where('category_status', 1)->inRandomOrder()->limit(10)->get();
         return view('page.home', compact('banner_data', 'product_category', 'new_product', 'trand_product', 'brand_list'));
     }
 
-    public function getTrandProduct($product_id=false)
+    public function getTrandProduct($product_id = false)
     {
         $query = Product::with('defaultImg')->where('product_status', 1);
-        if($product_id){
-            $query->where('id','<>',$product_id);
+        if ($product_id) {
+            $query->where('id', '<>', $product_id);
         }
 
         $product_data = $query->orderby('created_at', 'desc')->inRandomOrder()->limit(8)->get();
         $data = [];
-        $cartItemsKeys = [];
-        if (isset($_COOKIE['shopping_cart'])) {
-            $cartItems = json_decode($_COOKIE['shopping_cart'], true);
-            $cartItemsKeys = array_keys($cartItems['items']);
-        }
-
-
 
         foreach ($product_data as $product) {
             $data_val['id'] = $product->id;
@@ -79,7 +74,7 @@ class PageController extends Controller
             $data_val['product_name'] = $product->product_name;
             $data_val['product_rate'] = $product->product_rate;
             $data_val['product_mrp'] = $product->product_mrp;
-            $data_val['cart_type'] = in_array($product->id, $cartItemsKeys) ? 'remove' : 'add';
+            $data_val['cart_type'] = $this->cartYesorNo($product->id);
 
             $data[] = $data_val;
         }
@@ -91,7 +86,6 @@ class PageController extends Controller
     {
         $product_data = Product::with('defaultImg')->where('product_status', 1)->orderby('created_at', 'desc')->limit(8)->get();
         $data = [];
-        
 
         foreach ($product_data as $product) {
             $data_val['id'] = $product->id;
@@ -109,9 +103,17 @@ class PageController extends Controller
     public function cartYesorNo($product_id)
     {
         $cartItemsKeys = [];
-        if (isset($_COOKIE['shopping_cart'])) {
-            $cartItems = json_decode($_COOKIE['shopping_cart'], true);
-            $cartItemsKeys = array_keys($cartItems['items']);
+        if (Auth::user()) {
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
+            if($cart_master){
+                $cartItemsKeys = CartItem::where('cart_id', $cart_master->id)->pluck('product_id')->toArray();
+            }
+            // dd($cartItemsKeys);
+        } else {
+            if (isset($_COOKIE['shopping_cart'])) {
+                $cartItems = json_decode($_COOKIE['shopping_cart'], true);
+                $cartItemsKeys = array_keys($cartItems);
+            }
         }
 
         return in_array($product_id, $cartItemsKeys) ? 'remove' : 'add';
@@ -119,23 +121,36 @@ class PageController extends Controller
 
     public function productDetails($prodid)
     {
-        $product_data = Product::with(['product_img' => function ($query) {
+        $product_data = Product::with(['product_img_2' => function ($query) {
             $query->orderBy('default_img', 'desc');
         }])->with(['product_review.users'])->with(['product_colors.colors'])->findorfail($prodid);
-        
+
         $averageRating = $product_data->product_review->avg('review_rating');
-        
+
         $cart_status = $this->cartYesorNo($prodid);
 
         $trand_product = $this->getTrandProduct($prodid);
-        
+
         return view('page.product_details', compact('product_data', 'trand_product', 'averageRating', 'cart_status'));
     }
 
-    public function product()
+    public function product(Request $request)
     {
-        $product_list = Product::with('defaultImg')->inRandomOrder()->get();
-        return view('page.product', compact('product_list'));
+        $category = $request->query('category');
+        // $product_list = Product::with('defaultImg')->inRandomOrder()->get();
+        $search = $request->input('search');
+        $product_list = Product::with('defaultImg')->when($category, function ($query, $category) {
+            return $query->where('category_id',$category);
+        })->when($search, function ($query, $search) {
+            return $query->where('product_name','like','%'.$search.'%');
+        })->inRandomOrder()->paginate(10);
+        foreach ($product_list as $key => $product) {
+            $product_list[$key]['cart_type'] = $this->cartYesorNo($product->id);
+        }
+        
+        $product_list->appends(['category' => $request->query('category')]);
+
+        return view('page.product', compact('product_list', 'search'));
     }
 
     public function checkout()
@@ -147,10 +162,17 @@ class PageController extends Controller
         // $cart_data = CartMaster::with('cart_item_list.product_list')->where('cart_status', 1)->first();
         if (Auth::user()) {
             $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('user_id', Auth::user()->id)->get();
+            // echo count($cart_data) ? 'empty' : 'not empty';
+            // dd($cart_data);
+            if(!count($cart_data)){
+                return redirect()->route('home');
+            }
         } else {
             $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('session_id', Session::getId())->get();
         }
-        return view('page.checkout', compact('cart_data', 'state_list'));
+
+        $addresslist = $this->myAddressList();
+        return view('page.checkout', compact('cart_data', 'state_list','addresslist'));
     }
 
     public function cart()
@@ -163,16 +185,18 @@ class PageController extends Controller
         if (Auth::user()) {
             $item_list = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('user_id', Auth::user()->id)->first();
             $cart_data = [];
-            foreach($item_list->cart_item_list as $items){
-                $item = [];
-                $item['id'] = $items->id;
-                $item['product_name'] = $items->product_list->product_name;
-                $item['image_name'] = $items->product_list->defaultImg->image_name;
-                $item['product_qty'] = $items->product_qty;
-                $item['product_mrp'] = $items->product_list->product_mrp;
-                $item['product_rate'] = $items->product_list->product_rate;
-                $item['cart_id'] = $items->id;
-                $cart_data[] = $item;
+            if (isset($item_list->cart_item_list)) {
+                foreach ($item_list->cart_item_list as $items) {
+                    $item = [];
+                    $item['id'] = $items->product_id;
+                    $item['product_name'] = $items->product_list->product_name;
+                    $item['image_name'] = $items->product_list->defaultImg->image_name;
+                    $item['product_qty'] = $items->product_qty;
+                    $item['product_mrp'] = $items->product_list->product_mrp;
+                    $item['product_rate'] = $items->product_list->product_rate;
+                    $item['cart_id'] = $items->id;
+                    $cart_data[] = $item;
+                }
             }
             // dd($cart_data);
 
@@ -184,26 +208,27 @@ class PageController extends Controller
             $cartItemsKeys = [];
             if (isset($_COOKIE['shopping_cart'])) {
                 $cartItems = json_decode($_COOKIE['shopping_cart'], true);
-                $cartItemsKeys = array_keys($cartItems['items']);
+                $cartItemsKeys = array_keys($cartItems);
             }
 
             $item_list = Product::with('defaultImg')->where('product_status', 1)->whereIn('id', $cartItemsKeys)->get();
             $cart_data = [];
-            foreach($item_list as $items){
+            foreach ($item_list as $items) {
                 $item = [];
                 $item['id'] = $items->id;
                 $item['product_name'] = $items->product_name;
                 $item['image_name'] = $items->defaultImg->image_name;
-                $item['product_qty'] = $cartItems['items'][$items->id]['quantity'];
+                $item['product_qty'] = $cartItems[$items->id]['quantity'];
                 $item['product_mrp'] = $items->product_mrp;
                 $item['product_rate'] = $items->product_rate;
                 $item['cart_id'] = $items->id;
                 $cart_data[] = $item;
             }
         }
+        $cart_fees = CartFee::get();
         // dd($cart_data);
         // $trand_product = DB::table('dummy_top_tranding as dtt')->select('product_name','product_rate','product_img')->join('dummy_products_details as dpd','dpd.id','=','dtt.product_id')->groupBy('dtt.product_id')->inRandomOrder()->limit(8)->get();
-        return view('page.cart', compact('cart_data'));
+        return view('page.cart', compact('cart_data', 'cart_fees'));
     }
 
 
@@ -280,7 +305,7 @@ class PageController extends Controller
             $cart_count = $this->cart_count;
             // dd(count(array_keys($cart_count['items'])));
         }
-        $data['body'] = "remove to cart";
+        // $data['body'] = "remove to cart";
         $data['cartcount'] = $cart_count;
         return response()->json($data);
     }
@@ -288,7 +313,16 @@ class PageController extends Controller
     public function removetocart(Request $request)
     {
         $product = Product::findOrFail($request->input('product_id'));
-        $this->cookiefunction($product, 'remove');
+        if (Auth::user()) {
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
+            $cart_item = CartItem::where('cart_id', $cart_master->id)->where('product_id', $product->id)->first();
+            if ($cart_item != null) {
+                $cart_item->delete();
+            }
+            $this->cart_count = CartItem::where('cart_id', $cart_master->id)->count();
+        } else {
+            $this->cookiefunction($product, 'remove');
+        }
 
         $data['cartcount'] = $this->cart_count;
         return response()->json($data);
@@ -296,11 +330,12 @@ class PageController extends Controller
 
     public function cookiefunction($product = null, $type = 'add'): void
     {
+        $cartItems = array();
         if (isset($_COOKIE['shopping_cart'])) {
             $cartItems = json_decode($_COOKIE['shopping_cart'], true);
         }
         if ($product) {
-            $cartItems['items'][$product->id] = [
+            $cartItems[$product->id] = [
                 'item_id' => $product->id,
                 'quantity' => 1,
                 'price' => $product->product_rate,
@@ -309,13 +344,14 @@ class PageController extends Controller
             ];
 
             if ($type == 'remove') {
-                unset($cartItems['items'][$product->id]);
+                unset($cartItems[$product->id]);
             }
         }
-
-        $array_value = array_column($cartItems['items'], 'sub_total');
-        $cartItems['values']['sub_total'] = array_sum($array_value);
-
+        $array_value = [];
+        if (isset($cartItems)) {
+            $array_value = array_column($cartItems, 'sub_total');
+            // $cartItems['values']['sub_total'] = array_sum($array_value);
+        }
         $cookie_name = "shopping_cart";
 
         $cookie_value = json_encode($cartItems);
@@ -343,8 +379,7 @@ class PageController extends Controller
 
     public function updatecart(Request $request)
     {
-        if(Auth::user())
-        {
+        if (Auth::user()) {
             $cart = CartItem::where('id', $request->input('cart_id'))->first();
             if ($cart == null) {
                 $data['msg'] = 'unable to update this cart id';
@@ -360,32 +395,31 @@ class PageController extends Controller
             }
 
             $this->getcartcount();
-
-        }else{
+        } else {
             if (isset($_COOKIE['shopping_cart'])) {
                 $cartItems = json_decode($_COOKIE['shopping_cart'], true);
 
                 if ($request->input('update_type') == 'remove') {
-                    unset($cartItems['items'][$request->input('cart_id')]);
+                    unset($cartItems[$request->input('cart_id')]);
                 }
 
                 $itemval = [];
-                foreach($cartItems['items'] as $items){
+                foreach ($cartItems as $items) {
                     $product_qty = $items['quantity'];
-                    if($items['item_id'] == $request->input('cart_id')){
+                    if ($items['item_id'] == $request->input('cart_id')) {
                         $product_qty = $request->input('prod_qty');
                     }
                     $itemval[$items['item_id']] = [
                         'item_id' => $items['item_id'],
                         'quantity' => $product_qty,
                         'price' => $items['price'],
-                        'sub_total' => ($items['price']*$product_qty),
+                        'sub_total' => ($items['price'] * $product_qty),
                         'item_color' => 'default'
                     ];
                 }
-                $cartItems['items'] = $itemval;
-                $array_value = array_column($cartItems['items'], 'sub_total');
-                $cartItems['values']['sub_total'] = array_sum($array_value);
+                $cartItems = $itemval;
+                $array_value = array_column($cartItems, 'sub_total');
+                // $cartItems['values']['sub_total'] = array_sum($array_value);
 
                 $cookie_name = "shopping_cart";
 
@@ -397,7 +431,6 @@ class PageController extends Controller
 
                 $this->cart_count = count($array_value);
             }
-
         }
         $data['msg'] = 'successfully updated cart';
         $data['cart_count'] = $this->cart_count;
@@ -436,10 +469,7 @@ class PageController extends Controller
         $orderMaster->order_master_id = $order_master_id;
         $orderMaster->cart_id = $cart_data->id;
         $orderMaster->user_id = Auth::user()->id;
-        $orderMaster->order_date = date("Y-m-d");
-        $orderMaster->sub_total = 4.5;
-        $orderMaster->other_amt = 4.5;
-        $orderMaster->total_amt = 4.5;
+        $orderMaster->order_date = date("Y-m-d H:i:s");
         $orderMaster->payment_status = 1;
         $orderMaster->payment_mode = $request->input('payment');
         $orderMaster->payment_reference_no = $request->input('gpay_ref_no');
@@ -450,6 +480,7 @@ class PageController extends Controller
         $orderMasterID = $orderMaster->id;
         $sub_total_overall = 0;
         $total_amt_overall = 0;
+        $total_order_qty = 0;
         foreach ($cart_data->cart_item_list as $item_list) {
 
             $sub_total = round($item_list->product_list->product_rate * $item_list->product_qty, 2);
@@ -464,6 +495,7 @@ class PageController extends Controller
             $orderItem->order_id = $orderMasterID;
             $orderItem->order_master_id = $order_master_id;
             $orderItem->user_id = Auth::user()->id;
+            $orderItem->product_id = $item_list->product_list->id;
             $orderItem->product_name = $item_list->product_list->product_name;
             $orderItem->color_name = $color_name;
             $orderItem->product_qty = $item_list->product_qty;
@@ -474,13 +506,16 @@ class PageController extends Controller
             $orderItem->gst_per = 0;
             $orderItem->gst_amt = 0;
             $orderItem->total_amt = $total_amt;
+            $orderItem->order_status = 1;
+            $orderItem->order_date = date("Y-m-d H:i:s");
             $orderItem->save();
 
             $sub_total_overall += $sub_total;
             $total_amt_overall += $total_amt;
+            $total_order_qty += $item_list->product_qty;
         }
 
-        $valid = OrderMaster::where('id', $orderMaster->id)->update(['sub_total' => $sub_total_overall, 'total_amt' => $total_amt_overall]);
+        $valid = OrderMaster::where('id', $orderMaster->id)->update(['sub_total' => $sub_total_overall, 'total_amt' => $total_amt_overall,'total_order_qty' => $total_order_qty]);
 
         if ($valid) {
             CartMaster::where('id', $cart_data->id)->update(['cart_status' => 2]);
@@ -497,5 +532,74 @@ class PageController extends Controller
         } else {
             return redirect()->route('home');
         }
+    }
+
+    public function myorderlist()
+    {
+        $orderItems = [];
+        $orderMaster = OrderMaster::where('order_status', '1')->where('user_id', Auth::user()->id)->pluck('id');
+        if(count($orderMaster)){
+            $orderItems = OrderItem::whereIn('order_id', $orderMaster)->orderby('created_at','desc')->get();
+        }
+
+        return view('page.orderlist', compact('addresslist'));
+    }
+
+    public function myaddress(Request $request)
+    {
+        
+        $addresslist = $this->myAddressList();
+        return view('page.myaddress',  compact('addresslist'));
+
+    }
+
+    public function myaddressAdd(Request $request):RedirectResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'contact_name' => 'required|string|max:50',
+            'contact_mobile' => 'required|numeric|digits:10',
+            'address_line1' => 'required|string|max:150',
+            'address_line2' => 'nullable|string|max:150',
+            'city' => 'required|string|max:50',
+            'state' => 'required|string|max:50',
+            'pincode' => 'required|numeric|digits:6',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // $my_address =  new MyAddress();
+        // $my_address->contact_name = $request->contact_name;
+        // $my_address->make_default = ($request->isdefault) ? 1 : 0;
+        // $my_address->contact_mobile = $request->contact_mobile;
+        // $my_address->address_line1 = $request->address_line1;
+        // $my_address->address_line2 = $request->address_line2;
+        // $my_address->address_city = $request->city;
+        // $my_address->address_state = $request->state;
+        // $my_address->address_pincode = $request->pincode;
+        // $my_address->save();
+
+        $address_data = [];
+        $address_data['contact_name'] = $request->input('contact_name');
+        $address_data['contact_mobile'] = $request->input('contact_mobile');
+        $address_data['address_line1'] = $request->input('address_line1');
+        $address_data['address_line2'] = $request->input('address_line2');
+        $address_data['address_city'] = $request->input('city');
+        $address_data['address_state'] = $request->input('state');
+        $address_data['address_pincode'] = $request->input('pincode');
+        $address_data['make_default'] = ($request->input('isdefault')) ? 1 : 0;
+        $address_data['user_id'] = Auth::user()->id;
+
+        MyAddress::updateOrCreate(['id'=>$request->input('address_id')],$address_data);
+        
+        return redirect()->route("profile.myaddress");
+
+    }
+
+    public function myAddressList()
+    {
+        return MyAddress::where('user_id', Auth::user()->id)->get();
     }
 }

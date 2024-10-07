@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('mobileno')->unique();
             //user type added // Kalaiarasu
             $table->enum('type',array('user','admin'))->default('user'); //user = 0, admin = 1
             //end
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->softDeletes('deleted_at');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -11,42 +11,42 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>First Name<span class="text-danger">*</span></label>
-                                <input class="form-control" type="text" name="bill_firstname" id="bill_firstname" placeholder="First Name" value="{{old('bill_firstname')}}" required>
+                                <input class="form-control" type="text" name="bill_firstname" id="bill_firstname" placeholder="First Name" value="{{old('bill_firstname')}}" required autocomplete="bill_firstname">
                                 @error('bill_firstname')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label>Last Name</label>
-                                <input class="form-control" name="bill_lastname" id="bill_lastname" type="text" placeholder="Last Name" value="{{old('bill_firstname')}}">
+                                <input class="form-control" name="bill_lastname" id="bill_lastname" type="text" placeholder="Last Name" value="{{old('bill_lastname')}}" autocomplete="bill_lastname">
                                 @error('bill_lastname')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label>Contact No<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_contactno" id="bill_contactno"  type="text" placeholder="Contact No" required value="{{old('bill_contactno')}}">
+                                <input class="form-control" name="bill_contactno" id="bill_contactno"  type="text" placeholder="Contact No" required value="{{old('bill_contactno')}}" autocomplete="bill_contactno">
                                 @error('bill_contactno')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label>Address Line 1<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_address_line1" id="bill_address_line1" type="text" placeholder="Address Line 1" required value="{{old('bill_address_line1')}}">
+                                <input class="form-control" name="bill_address_line1" id="bill_address_line1" type="text" placeholder="Address Line 1" required value="{{old('bill_address_line1')}}" autocomplete="bill_address_line1">
                                 @error('bill_address_line1')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label>Address Line 2</label>
-                                <input class="form-control" name="bill_address_line2" id="bill_address_line2" type="text" placeholder="Address Line 2" value="{{old('bill_address_line2')}}">
+                                <input class="form-control" name="bill_address_line2" id="bill_address_line2" type="text" placeholder="Address Line 2" value="{{old('bill_address_line2')}}" autocomplete="bill_address_line2">
                                 @error('bill_address_line2')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label>City<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_city" id="bill_city" type="text" placeholder="City" required value="{{old('bill_city')}}">
+                                <input class="form-control" name="bill_city" id="bill_city" type="text" placeholder="City" required value="{{old('bill_city')}}" autocomplete="bill_city">
                                 @error('bill_city')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -66,7 +66,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="pincode">Pin Code<span class="text-danger">*</span></label>
-                                <input class="form-control"  name="bill_pincode" id="bill_pincode" type="text" placeholder="Pincode" required value="{{old('bill_pincode')}}">
+                                <input class="form-control"  name="bill_pincode" id="bill_pincode" type="text" placeholder="Pincode" required value="{{old('bill_pincode')}}" autocomplete="bill_pincode">
                                 @error('bill_pincode')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -81,32 +81,31 @@
                                     <h5 class="font-weight-medium mb-3">Products</h5>
                                     @php
                                     $subtotal = 0;
+                                    $total_saving = 0;
                                     @endphp
                                     @foreach($cart_data as $cart_data_list)
                                     @foreach($cart_data_list->cart_item_list as $cart)
                                     <div class="d-flex justify-content-between">
-                                        <p>{{$cart->product_list->product_name}} <br /><small>({{$cart->product_qty}} * {{$cart->product_list->product_rate}})</small></p>
-                                        <p>{{ number_format($cart->product_qty * $cart->product_list->product_rate,2)}}</p>
+                                        <p><span style="color:black !important">{{$cart->product_list->product_name}}</span> <br /><small>(Qty:{{$cart->product_qty}} * Rs.{{$cart->product_list->product_rate}}) MRP:Rs.{{$cart->product_list->product_mrp}}</small></p>
+                                        <p>Rs. {{ number_format($cart->product_qty * $cart->product_list->product_rate,2)}}</p>
                                     </div>
                                     @php
                                     $subtotal += $cart->product_qty * $cart->product_list->product_rate;
+                                    $total_saving += $cart->product_qty * $cart->product_list->product_mrp;
                                     @endphp
                                     @endforeach
                                     @endforeach
                                     <hr class="mt-0">
                                     <div class="d-flex justify-content-between mb-3 pt-1">
-                                        <h6 class="font-weight-medium">Subtotal</h6>
-                                        <h6 class="font-weight-medium">${{number_format($subtotal,2)}}</h6>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="font-weight-medium">Shipping</h6>
-                                        <h6 class="font-weight-medium">$10.00</h6>
+                                        <h6 class="font-weight-medium">Subtotal <p><small>Total Saving: Rs: {{number_format($total_saving-$subtotal,2)}}</small></p></h6>
+                                        <h6 class="font-weight-medium">Rs. {{number_format($subtotal,2)}}</h6>
+                                           
                                     </div>
                                 </div>
                                 <div class="card-footer border-secondary bg-transparent">
                                     <div class="d-flex justify-content-between mt-2">
                                         <h5 class="font-weight-bold">Total</h5>
-                                        <h5 class="font-weight-bold">${{number_format($subtotal+10,2)}}</h5>
+                                        <h5 class="font-weight-bold">Rs. {{number_format($subtotal,2)}}</h5>
                                         <input type="hidden" name="cart_master_id" id="cart_master_id" value="{{$cart_data_list->id}}">
                                     </div>
                                 </div>
@@ -182,7 +181,7 @@
                     <div class="card-body">
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="gpay" required value="gpay" {{ (old('payment') == 'gpay') ? 'checked' : ''}} >
+                                <input type="radio" class="custom-control-input" name="payment" id="gpay" required value="gpay" {{ (old('payment') == 'gpay') ? 'checked' : ''}}  >
                                 <label class="custom-control-label" for="gpay">GPay </label>
                             </div>
                             @error('gpay_ref_no')
@@ -210,9 +209,9 @@
                         <div class="form-group gpaydiv" {{ (old('payment') == 'gpay') ? '' : 'style=display:none;' }} >
                             <label for=""><strong>Gpay</strong></label>
                             <p>Scan and Pay this QR Code and enter the reference no</p>
-                            <x-img-tag img_url="img/gpay_scanner.jpeg" class="w-80" />
+                            <x-img-tag img_url="{{ getGpayImg() }}" class="w-80" />
                             <label for="gpay_ref_no">Reference No <span class="text-danger">*</span></label>
-                            <input type="text" name="gpay_ref_no" id="gpay_ref_no" value="{{old('gpay_ref_no')}}"class="form-control">
+                            <input type="text" name="gpay_ref_no" id="gpay_ref_no" value="{{old('gpay_ref_no')}}"class="form-control" autocomplete="gpay_ref_no">
                             @error('gpay_ref_no')
                         <small class="text-danger">{{ $message }}</small>
                         @enderror
@@ -222,7 +221,7 @@
                             <p>Scan and Pay this QR Code and enter the reference no</p>
                             <x-img-tag img_url="img/product-1.jpg" class="w-100" />
                             <label for="paypal_ref_no">Reference No <span class="text-danger">*</span></label>
-                            <input type="text" name="paypal_ref_no" id="paypal_ref_no" class="form-control">
+                            <input type="text" name="paypal_ref_no" id="paypal_ref_no" class="form-control" autocomplete="paypal_ref_no">
                             @error('paypal_ref_no')
                         <small class="text-danger">{{ $message }}</small>
                         @enderror

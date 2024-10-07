@@ -19,6 +19,11 @@ class Product extends Model
         return $this->hasMany(ProductImg::class,'product_id')->orderby('default_img','desc');
     }
 
+
+    public function product_img_2() {
+        return $this->hasMany(ProductImg::class,'product_id')->where('default_img',1);
+    }
+
     public function product_review() {
         return $this->hasMany(ProductReview::class);
     }
