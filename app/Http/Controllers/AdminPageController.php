@@ -113,7 +113,9 @@ class AdminPageController extends Controller
     {
         $orderList = [];
         $orderList = OrderMaster::with('getuserName')->orderby('created_at', 'desc')->get();
-        return view('admin.orderlist', compact('orderList'));
+        $todayorderList = [];
+        $todayorderList = OrderMaster::with('getuserName')->where('created_at','>=',date("Y-m-d"))->orderby('created_at', 'desc')->get();
+        return view('admin.orderlist', compact('orderList','todayorderList'));
     }
 
     public function orderedit($id)

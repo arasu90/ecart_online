@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,6 +26,7 @@ class PageController extends Controller
 {
     public $cart_count = 0;
     public $cookie_cart = array();
+    public $backto;
 
     public function __construct()
     {
@@ -440,14 +442,16 @@ class PageController extends Controller
     public function checkoutpayment(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'bill_firstname' => 'required|string|max:50',
-            'bill_lastname' => 'nullable|string|max:50',
-            'bill_contactno' => 'required|numeric',
-            'bill_address_line1' => 'required|string|max:200',
-            'bill_address_line2' => 'nullable|string|max:200',
-            'bill_city' => 'required|string|max:50',
-            'bill_state' => 'required|string|max:50',
-            'bill_pincode' => 'required|numeric',
+            // 'bill_firstname' => 'required|string|max:50',
+            // 'bill_lastname' => 'nullable|string|max:50',
+            // 'bill_contactno' => 'required|numeric',
+            // 'bill_address_line1' => 'required|string|max:200',
+            // 'bill_address_line2' => 'nullable|string|max:200',
+            // 'bill_city' => 'required|string|max:50',
+            // 'bill_state' => 'required|string|max:50',
+            // 'bill_pincode' => 'required|numeric',
+
+            'bill_address' => 'required|numeric',
             'cart_master_id' => 'required|numeric',
             'payment' => 'required|in:gpay,paypal,banktransfer',
             'gpay_ref_no'  => 'required_if:payment,==,gpay',
@@ -462,7 +466,8 @@ class PageController extends Controller
 
         $cart_data = CartMaster::with('cart_item_list.product_list.product_colors.colors')->findorfail($request->cart_master_id);
 
-        $billing_address = $request->input('bill_firstname') . "|" . $request->input('bill_lastname') . "|" . $request->input('bill_contactno') . "|" . $request->input('bill_address_line1') . "|" . $request->input('bill_address_line2') . "|" . $request->input('bill_city') . "|" . $request->input('bill_state') . "|" . $request->input('bill_pincode');
+        $get_address = MyAddress::findorfail($request->bill_address);
+        $billing_address = $get_address->contact_name."|".$get_address->contact_mobile."|".$get_address->address_line1."|".$get_address->address_line2."|".$get_address->address_city."|".$get_address->address_state."|".$get_address->address_pincode;
 
         $orderMaster = new OrderMaster();
         $order_master_id = Uuid::randomNumber();
@@ -542,15 +547,17 @@ class PageController extends Controller
             $orderItems = OrderItem::whereIn('order_id', $orderMaster)->orderby('created_at','desc')->get();
         }
 
-        return view('page.orderlist', compact('addresslist'));
+        return view('page.orderlist', compact('orderItems'));
     }
 
     public function myaddress(Request $request)
     {
-        
+        $backto = $request->input('backto');
+        if($backto){
+            Session::put('backto', $backto);
+        }
         $addresslist = $this->myAddressList();
         return view('page.myaddress',  compact('addresslist'));
-
     }
 
     public function myaddressAdd(Request $request):RedirectResponse
@@ -594,6 +601,9 @@ class PageController extends Controller
 
         MyAddress::updateOrCreate(['id'=>$request->input('address_id')],$address_data);
         
+        if(Route::has(session('backto'))){
+            return redirect()->route(session('backto'));
+        }
         return redirect()->route("profile.myaddress");
 
     }

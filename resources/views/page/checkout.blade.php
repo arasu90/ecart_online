@@ -9,68 +9,33 @@
                     <h4 class="font-weight-semi-bold mb-4">Billing Address</h4>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>First Name<span class="text-danger">*</span></label>
-                                <input class="form-control" type="text" name="bill_firstname" id="bill_firstname" placeholder="First Name" value="{{old('bill_firstname')}}" required autocomplete="bill_firstname">
-                                @error('bill_firstname')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Last Name</label>
-                                <input class="form-control" name="bill_lastname" id="bill_lastname" type="text" placeholder="Last Name" value="{{old('bill_lastname')}}" autocomplete="bill_lastname">
-                                @error('bill_lastname')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Contact No<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_contactno" id="bill_contactno"  type="text" placeholder="Contact No" required value="{{old('bill_contactno')}}" autocomplete="bill_contactno">
-                                @error('bill_contactno')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Address Line 1<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_address_line1" id="bill_address_line1" type="text" placeholder="Address Line 1" required value="{{old('bill_address_line1')}}" autocomplete="bill_address_line1">
-                                @error('bill_address_line1')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Address Line 2</label>
-                                <input class="form-control" name="bill_address_line2" id="bill_address_line2" type="text" placeholder="Address Line 2" value="{{old('bill_address_line2')}}" autocomplete="bill_address_line2">
-                                @error('bill_address_line2')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>City<span class="text-danger">*</span></label>
-                                <input class="form-control" name="bill_city" id="bill_city" type="text" placeholder="City" required value="{{old('bill_city')}}" autocomplete="bill_city">
-                                @error('bill_city')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>State<span class="text-danger">*</span></label>
+                            <a href="{{ route('profile.myaddress','backto=checkout') }}" class="btn btn-sm btn-success">Add New Address</a>
+                            @error('bill_address')
+                            <small class="text-danger">{{ __('Please Select Address') }}</small>
+                            @enderror
+                            @php
+                                $counter = 7;
+                            @endphp
 
-                                <select class="form-control" name="bill_state" id="bill_state" required>
-                                    <option value="">Select State</option>
-                                    @foreach($state_list as $state )
-                                    <option value="{{$state}}" {{ (old('bill_state') == $state ? "selected":"") }} >{{$state}}</option>
-                                    @endforeach
-                                </select>
-                                @error('bill_state')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="pincode">Pin Code<span class="text-danger">*</span></label>
-                                <input class="form-control"  name="bill_pincode" id="bill_pincode" type="text" placeholder="Pincode" required value="{{old('bill_pincode')}}" autocomplete="bill_pincode">
-                                @error('bill_pincode')
-                                <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
+                            @forelse ($addresslist as $address)
+                                @php
+                                    if($address->make_default == 0){
+                                        $counter++;
+                                    }
+                                @endphp
+                                <div class="form-group">
+                                    <span>
+                                        <input type="radio" class="radio" name="bill_address" id="bill_address" {{ ($address->make_default == 1 || $counter == count($addresslist))? 'checked' : '' }} value="{{ $address->id }}">
+                                        {{ $address->contact_name }}
+                                    </span><br />
+                                    <span class="px-3">{{ $address->contact_mobile }}</span> <br />
+                                    <span class="px-3">{{ $address->address_line1 }}, {{ $address->address_line2 }}</span> <br />
+                                    <span class="px-3">{{ $address->address_city }}, {{ $address->address_state }} - {{ $address->address_pincode }}</span class="px-3">
+                                </div>
+                            @empty
+                                
+                            @endforelse
+
                         </div>
                         <div class="col-md-6 form-group">
                             <div class="card border-secondary mb-5">

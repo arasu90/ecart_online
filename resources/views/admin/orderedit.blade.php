@@ -73,30 +73,26 @@
                                                     echo "</br>";
                                                     break;
                                                 case(1):
-                                                    echo "<strong>Last Name: </strong>".$detail;
-                                                    echo "</br>";
-                                                    break;
-                                                case(2):
                                                     echo "<strong>Mobile No: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
-                                                case(3):
+                                                case(2):
                                                     echo "<strong>Address Line 1: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
-                                                case(4):
+                                                case(3):
                                                     echo "<strong>Address Line 2: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
-                                                case(5):
+                                                case(4):
                                                     echo "<strong>City: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
-                                                case(6):
+                                                case(5):
                                                     echo "<strong>State: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
-                                                case(7):
+                                                case(6):
                                                     echo "<strong>PinCode: </strong>".$detail;
                                                     echo "</br>";
                                                     break;
