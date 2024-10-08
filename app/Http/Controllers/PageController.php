@@ -55,13 +55,13 @@ class PageController extends Controller
             return redirect()->route('verification.notice');
         }
         $banner_data = HomeBanner::get();
-        $brand_list = DB::table('dummy_brand')->get();
+        // $brand_list = DB::table('dummy_brand')->get();
         // $brand_list = '';
         $trand_product = $this->getTrandProduct();
         // dd($trand_product);
         $new_product = $this->getNewProduct();
         $product_category = Category::where('category_status', 1)->inRandomOrder()->limit(10)->get();
-        return view('page.home', compact('banner_data', 'product_category', 'new_product', 'trand_product', 'brand_list'));
+        return view('page.home', compact('banner_data', 'product_category', 'new_product', 'trand_product'));
     }
 
     public function getTrandProduct($product_id = false)

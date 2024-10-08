@@ -174,20 +174,5 @@
     <!-- Products End -->
 
 
-    <!-- Vendor Start -->
-    <div class="container-fluid py-5">
-        <div class="row px-xl-5">
-            <div class="col">
-                <div class="owl-carousel vendor-carousel">
-                    @foreach($brand_list as $brand)
-                    <div class="vendor-item border p-4">
-                        <x-img-tag img_url="{{ $brand->brand_img }}" />
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Vendor End -->
 
 </x-guest-layout>
