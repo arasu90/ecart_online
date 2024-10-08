@@ -58,9 +58,13 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body:{
+                    'order_master_id':'{{ $ordermaster->id }}',
+                    'cart_master_id':'{{ $ordermaster->cart_id }}'
                 }
             });
-
+          
             // Check if the response is ok and handle errors
             if (!response.ok) {
                 const errorData = await response.json();
@@ -91,6 +95,8 @@
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
+                            'order_master_id':'{{ $ordermaster->id }}',
+                            'cart_master_id':'{{ $ordermaster->cart_id }}'
                         }),
                     }).then(response => response.json()).then(data => {
                         window.location = "thankyou";

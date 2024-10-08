@@ -106,3 +106,19 @@ rgba(209, 156, 151, 0.5) - rgba(90, 199, 77, 0.5)
 #ba6a62 - #17aa21
 
 rgba(183, 138, 135, 0.5) - rgba(135, 183, 154, 0.5)
+
+
+
+### Important command new fresh
+
+composer update
+
+npm install 
+
+npm run build  
+
+php artisan storage:link
+
+php artisan migrate 
+
+php artisan db:seed

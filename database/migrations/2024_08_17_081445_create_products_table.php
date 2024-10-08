@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('product_name',50);
             $table->bigInteger('brand_id')->default(0)->nullable();
-            $table->foreign('brand_id')->references('id')->on('brands');
             $table->bigInteger('category_id')->unsigned()->index();
             $table->foreign('category_id')->references('id')->on('categories');
             $table->decimal('product_mrp', total: 8, places: 2)->default(0);

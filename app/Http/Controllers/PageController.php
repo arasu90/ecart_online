@@ -175,6 +175,9 @@ class PageController extends Controller
             }
         } else {
             $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('session_id', Session::getId())->get();
+            if(!count($cart_data)){
+                return redirect()->route('home');
+            }
         }
 
         $addresslist = $this->myAddressList();
@@ -539,7 +542,7 @@ class PageController extends Controller
     public function myorderlist()
     {
         $orderItems = [];
-        $orderMaster = OrderMaster::where('order_status', '1')->where('user_id', Auth::user()->id)->pluck('id');
+        $orderMaster = OrderMaster::where('order_status', '3')->where('payment_status', '3')->where('user_id', Auth::user()->id)->pluck('id');
         if(count($orderMaster)){
             $orderItems = OrderItem::whereIn('order_id', $orderMaster)->orderby('created_at','desc')->get();
         }

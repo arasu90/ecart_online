@@ -59,6 +59,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a href="{{route('overallorderlist')}}">
+            <i class="fas fa-truck-moving"></i>
+            <p>All Order List</p>
+          </a>
+        </li>
+        <li class="nav-item">
           <a href="{{route('homebanner')}}">
             <i class="fas fa-desktop"></i>
             <p>Home Page Banner</p>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartMaster;
+use App\Models\OrderItem;
 use App\Models\OrderMaster;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
@@ -17,6 +19,10 @@ class PaymentController extends Controller
         $api = new Api(getenv('RAYZORPAY_API_KEY_ID'), getenv('RAYZORPAY_API_KEY_SECRET'));
         $orderamt = session('orderamt');
         $receipt = getenv('DEVNAME').Uuid::randomNumber();
+
+        $order_master_id = $request->input('order_master_id');
+        $cart_master_id = $request->input('cart_master_id');
+
         // dd($orderamt);
         // Create an order
         $orderData = [
@@ -27,6 +33,11 @@ class PaymentController extends Controller
         ];
 
         try {
+
+            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 3]); // cart updated to order before payment
+            OrderMaster::where('id', $order_master_id)->update(['order_status' => 2, 'payment_status' => 2]);
+            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 2]);
+
             Log::channel('payment')->info('create order API data', [
                 'user_id' => Auth::user()->id,
                 'orderamt' => $orderamt,
@@ -52,6 +63,11 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
+
+            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 6]); // incase failed respose update 6 all status
+            OrderMaster::where('id', $order_master_id)->update(['order_status' => 6, 'payment_status' => 2]);
+            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 6]);
+
             Log::channel('payment')->error('create order failed', [
                 'user_id' => Auth::user()->id,
                 'orderamt' => $orderamt,
@@ -75,7 +91,10 @@ class PaymentController extends Controller
         $paymentId = $request->input('razorpay_payment_id');
         $orderId = $request->input('razorpay_order_id');
         $signature = $request->input('razorpay_signature');
+        $order_master_id = $request->input('order_master_id');
+        $cart_master_id = $request->input('cart_master_id');
 
+        
         // Verify the payment signature
         $api = new Api(getenv('RAYZORPAY_API_KEY_ID'), getenv('RAYZORPAY_API_KEY_SECRET'));
 
@@ -86,6 +105,10 @@ class PaymentController extends Controller
                 'razorpay_signature' => $signature,
             ]);
 
+            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 5]); // cart updated to order
+            OrderMaster::where('id', $order_master_id)->update(['order_status' => 3, 'payment_status' => 3, 'payment_mode'=>'RazorPay','payment_reference_no'=>$paymentId]);
+            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 3]);
+            
             Log::channel('payment')->error('payment callback success', [
                 'user_id' => Auth::user()->id,
                 'razorpay_order_id' => $orderId,
@@ -97,6 +120,10 @@ class PaymentController extends Controller
             Session::put('thankyou_success',"Successfully");
             return response()->json(['status' => 'success','message'=>'success']);
         } catch (\Exception $e) {
+
+            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 4]); // cart updated to order
+            OrderMaster::where('id', $order_master_id)->update(['order_status' => 4, 'payment_status' => 4]);
+            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 4]);
 
             Log::channel('payment')->error('payment callback failed', [
                 'user_id' => Auth::user()->id,

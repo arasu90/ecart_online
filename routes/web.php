@@ -110,8 +110,7 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
     });
     Route::prefix('order')->group(function(){
         Route::get('/', [AdminPageController::class, 'orderlist'])->name('orderlist');
-        Route::get('/new', [BrandController::class, 'create'])->name('newbrand');
-        Route::post('/store', [BrandController::class, 'store'])->name('savebrand');
+        Route::get('/all', [AdminPageController::class, 'overallorderlist'])->name('overallorderlist');
         Route::get('/edit/{id}', [AdminPageController::class, 'orderedit'])->name('editorder');
         Route::post('/update/{id}', [AdminPageController::class, 'orderItemUpdate'])->name('updateorderitem');
     });
@@ -122,5 +121,4 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
     Route::get('/website', [AdminPageController::class, 'websitedata'])->name('website');
     Route::delete('/website/{id}', [AdminPageController::class, 'deletewebsite'])->name('deletewebsite');
     Route::post('/savewebsite', [AdminPageController::class, 'savewebsite'])->name('savewebsite');
-    
 });

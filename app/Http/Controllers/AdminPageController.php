@@ -112,10 +112,17 @@ class AdminPageController extends Controller
     public function orderlist()
     {
         $orderList = [];
-        $orderList = OrderMaster::with('getuserName')->orderby('created_at', 'desc')->get();
+        $orderList = OrderMaster::with('getuserName')->where('order_status','>=', 2)->where('payment_status','>=',2)->orderby('created_at', 'desc')->get();
         $todayorderList = [];
-        $todayorderList = OrderMaster::with('getuserName')->where('created_at','>=',date("Y-m-d"))->orderby('created_at', 'desc')->get();
+        $todayorderList = OrderMaster::with('getuserName')->where('order_status', '>=', 2)->where('payment_status','>=', 2)->where('created_at','>=',date("Y-m-d"))->orderby('created_at', 'desc')->get();
         return view('admin.orderlist', compact('orderList','todayorderList'));
+    }
+
+    public function overallorderlist()
+    {
+        $orderList = [];
+        $orderList = OrderMaster::with('getuserName')->orderby('created_at', 'desc')->get();
+        return view('admin.allorderlist', compact('orderList'));
     }
 
     public function orderedit($id)
@@ -224,7 +231,7 @@ class AdminPageController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'site_logo' => 'nullable|file|mimes:png|max:1000',
-            'site_desc' => 'required|string|max:200',
+            'site_desc' => 'nullable|string|max:200',
             'site_address' => 'required|string|max:100',
             'site_email' => 'required|email|string|lowercase|max:30',
             'site_mobile' => 'required|numeric|digits:10',

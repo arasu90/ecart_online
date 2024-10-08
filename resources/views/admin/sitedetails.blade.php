@@ -40,7 +40,7 @@
                                         class="form-control"
                                         id="site_desc"
                                         name="site_desc"
-                                        placeholder="Enter Fees Value">{{ old('site_desc', $page_data->site_desc) }}</textarea>
+                                        placeholder="Enter Site Description">{{ old('site_desc', $page_data->site_desc) }}</textarea>
                                     @error('site_desc')
                                     <span class="text-danger">{{ $message }}</span>
                                     @enderror
