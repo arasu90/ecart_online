@@ -32,7 +32,14 @@
                         <p>{{ $address->address_state }}</p>
                         <p>{{ $address->address_pincode }}</p>
                     </td>
-                    <td>{{ $address->contact_name }}</td>
+                    <td>
+                        <form action="{{ route('profile.deletemyaddress') }}" method="post">
+                            @csrf
+                            @method('delete')
+                            <input type="hidden" name="deladdress" value="{{ $address->id }}"/>
+                            <button type="submit" class="btn-link btn-primary">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             @empty
                 <tr class="text-center">

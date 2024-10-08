@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -50,6 +51,9 @@ class PageController extends Controller
     public function homepage()
     {
 
+        if(Auth::user() && !Auth::user()->hasVerifiedEmail()){
+            return redirect()->route('verification.notice');
+        }
         $banner_data = HomeBanner::get();
         $brand_list = DB::table('dummy_brand')->get();
         // $brand_list = '';
@@ -442,22 +446,10 @@ class PageController extends Controller
     public function checkoutpayment(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'bill_firstname' => 'required|string|max:50',
-            // 'bill_lastname' => 'nullable|string|max:50',
-            // 'bill_contactno' => 'required|numeric',
-            // 'bill_address_line1' => 'required|string|max:200',
-            // 'bill_address_line2' => 'nullable|string|max:200',
-            // 'bill_city' => 'required|string|max:50',
-            // 'bill_state' => 'required|string|max:50',
-            // 'bill_pincode' => 'required|numeric',
-
             'bill_address' => 'required|numeric',
-            'cart_master_id' => 'required|numeric',
-            'payment' => 'required|in:gpay,paypal,banktransfer',
-            'gpay_ref_no'  => 'required_if:payment,==,gpay',
-            'paypal_ref_no'  => 'required_if:payment,==,paypal',
-            'banktransfer_ref_no'  => 'required_if:payment,==,banktransfer',
+            'cart_master_id' => 'required|numeric'
         ]);
+        // dd($validator->errors());
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
@@ -519,20 +511,25 @@ class PageController extends Controller
             $total_amt_overall += $total_amt;
             $total_order_qty += $item_list->product_qty;
         }
+        
+        OrderMaster::where('id', $orderMaster->id)->update(['sub_total' => $sub_total_overall, 'total_amt' => $total_amt_overall,'total_order_qty' => $total_order_qty]);
 
-        $valid = OrderMaster::where('id', $orderMaster->id)->update(['sub_total' => $sub_total_overall, 'total_amt' => $total_amt_overall,'total_order_qty' => $total_order_qty]);
-
-        if ($valid) {
-            CartMaster::where('id', $cart_data->id)->update(['cart_status' => 2]);
-            return redirect()->route('thankyou')->with('success', 'suscccsglll');
-        } else {
-            return redirect()->route('thankyou')->with('failed', 'failed');
-        }
+        CartMaster::where('id', $cart_data->id)->update(['cart_status' => 2]);
+ 
+        $ordermasterid = $orderMaster->id;
+        $ordernumber = Uuid::randomNumber();
+        Log::info('checkout page confirmation:', [
+            'user_id' => Auth::user()->id,
+            'ordermasterid' => $ordermasterid,
+            'ordernumber'=>$ordernumber
+        ]);
+        return redirect()->route('makepayment',['makeorder'=>$ordermasterid,'accessorder'=>$ordernumber]);
     }
 
     public function thankyou()
     {
-        if (Session::has('success') || Session::has('failed')) {
+        if (Session::has('thankyou_success') || Session::has('thankyou_failed')) {
+            session()->forget(['thankyou_success', 'thankyou_failed']);
             return view('page.thankyou');
         } else {
             return redirect()->route('home');
@@ -610,6 +607,14 @@ class PageController extends Controller
 
     public function myAddressList()
     {
+
         return MyAddress::where('user_id', Auth::user()->id)->get();
+    }
+
+    public function deleteMyAddress(Request $request)
+    {
+        $deladdress = $request->input('deladdress');
+        MyAddress::where('id',$deladdress)->delete();
+        return redirect()->route("profile.myaddress");
     }
 }

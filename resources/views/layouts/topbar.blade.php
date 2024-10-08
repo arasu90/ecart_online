@@ -25,7 +25,7 @@
                 <span class="dropdown">
                     <button type="button" class="btn border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user text-primary"></i></button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <label for="form-label" class="text-primary label">Welcome {{ ucfirst(Auth::user()->name) }}</label>
+                        <label class="text-primary label">Welcome {{ ucfirst(Auth::user()->name) }}</label>
                         <a href="{{route('profile.edit')}}" class="dropdown-item">
                             <i class="fas fa-user-secret text-primary"></i> 
                             My Profile

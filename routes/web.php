@@ -4,8 +4,10 @@ use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -14,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('checkout');
 Route::post('/checkoutpayment', [PageController::class, 'checkoutpayment'])->middleware(['auth', 'verified'])->name('checkoutpayment');
+Route::get('/makepayment', [PaymentController::class, 'makepayment'])->middleware(['auth', 'verified'])->name('makepayment');
+Route::post('/create-order', [PaymentController::class, 'createOrder'])->middleware(['auth', 'verified'])->name('create-order');
+Route::post('/payment-callback', [PaymentController::class, 'paymentCallback'])->middleware(['auth', 'verified'])->name('payment-callback');
 Route::get('/thankyou', [PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('thankyou');
 Route::get('/myorderlist', [PageController::class, 'myorderlist'])->middleware(['auth', 'verified'])->name('myorderlist');
 
@@ -22,12 +27,13 @@ Route::get('/myorderlist', [PageController::class, 'myorderlist'])->middleware([
 // })->middleware('auth');
 
 // Route::get('/checkout', [PageController::class, 'checkout'])->name('checkout');
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
     Route::post('/myaddress', [PageController::class, 'myaddressAdd'])->name('profile.addmyaddress');
+    Route::delete('/deletemyaddress', [PageController::class, 'deleteMyAddress'])->name('profile.deletemyaddress');
     Route::patch('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
     Route::delete('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
 });
@@ -44,10 +50,22 @@ require __DIR__.'/auth.php';
 /**General user routes **/
 // Route::middleware(['auth', 'verified'])->get('/dashboard', [ProfileController::class, 'edit'])->name('dashboard');
 
-Route::get('/', [PageController::class, 'homepage'])->name('home');
+if(Auth::user()){
+    // Route::get('/', [PageController::class, 'homepage'])->middleware(['auth', 'verified'])->name('home');
+    Route::middleware(['auth', 'verified'])->get('/', [PageController::class, 'homepage'])->name('home');
+}else{
+    Route::get('/', [PageController::class, 'homepage'])->name('home');
+}
+
+if(Auth::user()){
+    Route::middleware(['auth', 'verified'])->get('/cart', [PageController::class, 'cart'])->name('cart');
+}else{
+    Route::get('/cart', [PageController::class, 'cart'])->name('cart');
+}
+
 Route::get('/product_details/{prodid}', [PageController::class, 'productDetails'])->name('productdetail');
 Route::get('/product', [PageController::class, 'product'])->name('product');
-Route::get('/cart', [PageController::class, 'cart'])->name('cart');
+
 Route::post('/savereview', [PageController::class, 'savereview'])->name('savereview');
 Route::post('/addtocart', [PageController::class, 'addtocart'])->name('addtocart');
 Route::post('/removetocart', [PageController::class, 'removetocart'])->name('removetocart');
