@@ -41,7 +41,7 @@ class PageController extends Controller
 
     public function getcartcount(): void
     {
-        $cart_id = CartMaster::where('cart_status', 1)->where('user_id', Auth::user()->id)->pluck('id');
+        $cart_id = CartMaster::whereIn('cart_status', [1,2])->where('user_id', Auth::user()->id)->pluck('id');
         $cart_count_val = CartItem::whereIn('cart_id', $cart_id)->count();
         if ($cart_id != null) {
             $this->cart_count = $cart_count_val;
@@ -110,7 +110,7 @@ class PageController extends Controller
     {
         $cartItemsKeys = [];
         if (Auth::user()) {
-            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->whereIn('cart_status', [1,2])->first();
             if($cart_master){
                 $cartItemsKeys = CartItem::where('cart_id', $cart_master->id)->pluck('product_id')->toArray();
             }
@@ -167,14 +167,14 @@ class PageController extends Controller
         $state_list = $list;
         // $cart_data = CartMaster::with('cart_item_list.product_list')->where('cart_status', 1)->first();
         if (Auth::user()) {
-            $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('user_id', Auth::user()->id)->get();
+            $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->whereIn('cart_status', [1,2])->where('user_id', Auth::user()->id)->get();
             // echo count($cart_data) ? 'empty' : 'not empty';
             // dd($cart_data);
             if(!count($cart_data)){
                 return redirect()->route('home');
             }
         } else {
-            $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('session_id', Session::getId())->get();
+            $cart_data = CartMaster::with('cart_item_list.product_list.defaultImg')->whereIn('cart_status', [1,2])->where('session_id', Session::getId())->get();
             if(!count($cart_data)){
                 return redirect()->route('home');
             }
@@ -192,7 +192,7 @@ class PageController extends Controller
         // $product_list = DB::table('dummy_products_details')->limit(4)->get();
         // $review_product = DB::table('dummy_review as dnl')->select('review_id','review','review_rating')->join('dummy_products_details as dpd','dpd.id','=','dnl.prod_id')->get();
         if (Auth::user()) {
-            $item_list = CartMaster::with('cart_item_list.product_list.defaultImg')->where('cart_status', 1)->where('user_id', Auth::user()->id)->first();
+            $item_list = CartMaster::with('cart_item_list.product_list.defaultImg')->whereIn('cart_status', [1,2])->where('user_id', Auth::user()->id)->first();
             $cart_data = [];
             if (isset($item_list->cart_item_list)) {
                 foreach ($item_list->cart_item_list as $items) {
@@ -266,7 +266,7 @@ class PageController extends Controller
         $cart_count = 0;
         $product = Product::findOrFail($request->input('product_id'));
         if (Auth::user()) {
-            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->whereIn('cart_status', [1,2])->first();
             if ($cart_master ==  null) {
                 $cart_master =  new CartMaster;
                 $cart_master->user_id = Auth::user()->id;
@@ -323,7 +323,7 @@ class PageController extends Controller
     {
         $product = Product::findOrFail($request->input('product_id'));
         if (Auth::user()) {
-            $cart_master = CartMaster::where('user_id', Auth::user()->id)->where('cart_status', 1)->first();
+            $cart_master = CartMaster::where('user_id', Auth::user()->id)->whereIn('cart_status', [1,2])->first();
             $cart_item = CartItem::where('cart_id', $cart_master->id)->where('product_id', $product->id)->first();
             if ($cart_item != null) {
                 $cart_item->delete();

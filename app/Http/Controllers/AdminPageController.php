@@ -168,7 +168,7 @@ class AdminPageController extends Controller
     public function useredit($id)
     {
         $user_list = User::findOrFail($id);
-        $orderList = OrderMaster::with('getuserName')->where('user_id', $id)->orderby('created_at', 'desc')->get();
+        $orderList = OrderMaster::with('getuserName')->where('user_id', $id)->where('order_status', '>=', 2)->where('payment_status','>=', 2)->orderby('created_at', 'desc')->get();
         $orderItems = OrderItem::where('order_id', '1')->get();
         return view('admin.useredit', compact('user_list', 'orderItems', 'orderList'));
     }
