@@ -122,7 +122,14 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab-pane-1">
                         <h4 class="mb-3">Product Description</h4>
-                        <p>{{ $product_data->product_detail }}</p>
+                        <table class="table">
+                            @foreach($product_data->product_detail_data as $detail_data)
+                            <tr>
+                                <td width="20%">{{ ucwords( $detail_data->product_data->row_title) }}</td>
+                                <td width="80%">: {{ $detail_data->product_data_value }}</td>
+                            </tr>  
+                            @endforeach
+                        </table>
                     </div>
                     <div class="tab-pane fade" id="tab-pane-2">
                         <h4 class="mb-3">Additional Information</h4>

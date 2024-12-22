@@ -39,7 +39,7 @@ class AdminPageController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:45|unique:categories,category_name',
-            'imagefile' => 'required|file|mimes:jpeg,jpg,png|max:1000'
+            'imagefile' => 'required|file|mimes:jpeg,jpg,png|max:10000'
         ]);
         if ($validator->fails()) {
             return redirect()->back()

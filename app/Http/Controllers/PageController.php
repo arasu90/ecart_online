@@ -129,8 +129,8 @@ class PageController extends Controller
     {
         $product_data = Product::with(['product_img_2' => function ($query) {
             $query->orderBy('default_img', 'desc');
-        }])->with(['product_review.users'])->with(['product_colors.colors'])->findorfail($prodid);
-
+        }])->with(['product_review.users'])->with(['product_detail_data.product_data'])->with(['product_colors.colors'])->findorfail($prodid);
+        // dd($product_data);
         $averageRating = $product_data->product_review->avg('review_rating');
 
         $cart_status = $this->cartYesorNo($prodid);

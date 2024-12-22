@@ -100,6 +100,13 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
         Route::post('/store', [ProductController::class, 'store'])->name('saveproduct');
         Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('editproduct');
         Route::post('/update/{id}', [ProductController::class, 'update'])->name('updateproduct');
+        Route::get('/addproductdata', [ProductController::class, 'addProductData'])->name('addproductdata');
+        Route::post('/addproductimage/{id}', [ProductController::class, 'addProductImage'])->name('addproductimage');
+        Route::delete('/deleteimage', [ProductController::class, 'deleteImage'])->name('deleteImage');
+        Route::post('/addproductdata', [ProductController::class, 'storeProductData'])->name('addproductdata');
+        Route::delete('/deletedatatitle', [ProductController::class, 'deleteProductData'])->name('deletedatatitle');
+        Route::post('/adddetails/{id}', [ProductController::class, 'addDetails'])->name('addproductdetails');
+        Route::delete('/deletedatavalue', [ProductController::class, 'deleteDetails'])->name('deletedatavalue');
     });
     Route::prefix('brand')->group(function(){
         Route::get('/', [BrandController::class, 'list'])->name('brandlist');
@@ -116,6 +123,9 @@ Route::middleware('adminAuth')->prefix('admin')->group(function(){
     });
     
     Route::get('/users', [AdminPageController::class, 'userlist'])->name('userlist');
+    Route::get('/test', function(){
+        return view("admin.test");
+    });
     Route::get('/edituser/{id}', [AdminPageController::class, 'useredit'])->name('useredit');
 
     Route::get('/website', [AdminPageController::class, 'websitedata'])->name('website');

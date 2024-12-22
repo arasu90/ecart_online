@@ -122,3 +122,5 @@ php artisan storage:link
 php artisan migrate 
 
 php artisan db:seed
+
+update php.ini file upload_max_filesize to 8MB
