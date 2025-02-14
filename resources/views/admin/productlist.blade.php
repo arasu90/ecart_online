@@ -1,3 +1,4 @@
+@inject('CommonClass', 'App\CommonClass')
 <x-admin-layout>
     @push('scripts')
     <script>
@@ -6,65 +7,87 @@
         });
     </script>
     @endpush
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Products</span>
-                    <span> @if(Session::has('error'))
-                        <span class="text-danger" role="alert">
-                            <strong>{{ Session::get('error') }} </strong>
-                        </span>
-                        @endif
-                        @if(Session::has('success'))
-                        <span class="text-success" role="alert">
-                            <strong>{{ Session::get('success') }}</strong>
-                        </span>
-                        @endif</span>
-                    <a href="{{route('newproduct')}}" class="btn btn-warning btn-sm pull-right">Add New</a>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><a href="javascript:void(0);" class="toggle-sidebar"><span class="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel"></span></a>{{ __('Product') }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="content-row">
+            @if(Session::has('success'))
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    {{ Session::get('success') }}
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table
-                            id="basic-datatables"
-                            class="display table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>SlNo</th>
-                                    <th>Product_Name</th>
-                                    <th>Category</th>
-                                    <th>Product_MRP</th>
-                                    <th>Product_Rate</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($product_list as $list)
-                                <tr>
-                                    <td>{{ $loop->index + 1 }}</td>
-                                    <td>{{ $list->product_name }}</td>
-                                    <td>{{ $list->category->category_name }}</td>
-                                    <td>{{ $list->product_mrp }}</td>
-                                    <td>{{ $list->product_rate }}</td>
-                                    <td>
-                                        <span class="badge {{ config('appstatus.productstatus.'.$list->product_status.'.color','badge-danger') }}">{{ config('appstatus.productstatus.'.$list->product_status.'.name','Inactive') }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="form-button-action">
-                                            <a href="{{ route('editproduct', $list->id) }}" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Product"><i class="fa fa-edit"></i></a>
-                                            <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Remove">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                @endif
+                @if(Session::has('error'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    {{ Session::get('error') }}
+                </div>
+                @endif
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <b>Product List</b>
+                            <a href="{{ route('admin.productnew') }}" class="btn btn-sm btn-success">Add New</a>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table id="basic-datatables" class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>Product Image</th>
+                                        <th>Product MRP</th>
+                                        <th>Product Price</th>
+                                        <th>Product Tax</th>
+                                        <th>Product Stock</th>
+                                        <th>Product Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($product_list as $list)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ ucfirst($list->product_name) }}</td>
+                                        <td>
+                                            <x-img-tag image_url="{{ $list->defaultImg->product_img }}" />
+                                        </td>
+                                        <td>{{ $list->product_mrp }}</td>
+                                        <td>{{ $list->product_price }}</td>
+                                        <td>{{ $list->product_tax }} %</td>
+                                        <td>
+                                            @if($list->product_stock)
+                                                <strong>{{ $list->product_stock }}</strong>
+                                            @else
+                                                <span class="badge badge-danger">out of stock</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {!! html_entity_decode($CommonClass->getStatus($list->product_status)) !!}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.productedit',$list->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="glyphicon glyphicon-edit"></i>
+                                            </a>
+                                            <a href="{{ route('admin.productdelete',$list->id) }}" class="btn btn-sm btn-danger">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- panel body -->
     </div>
 </x-admin-layout>

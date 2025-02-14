@@ -16,10 +16,20 @@ class AdminAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::user()?->type == 'admin'){ // admin = 1 superAdmin = 2
+        if(!Auth::user()){
+            return redirect()->route('admin.login')->with('login_error', 'Your Session has expired');
+        }
+
+        if(Auth::user()?->user_type == 'admin'){
             return $next($request);
         }else{
-            return redirect()->route('login')->with('error', 'You do not have permission to access this page !');
+            Auth::guard('web')->logout();
+
+            $request->session()->invalidate();
+
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('admin.login')->with('login_error', 'You do not have permission to access this page !');
         }
     }
 }

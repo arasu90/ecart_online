@@ -1,124 +1,114 @@
 <?php
 
-use App\Http\Controllers\AdminPageController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\HomeBannerController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\AddressBookController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::middleware('defaultParameter')->group(function () {
 
-Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('checkout');
-Route::post('/checkoutpayment', [PageController::class, 'checkoutpayment'])->middleware(['auth', 'verified'])->name('checkoutpayment');
-Route::get('/makepayment', [PaymentController::class, 'makepayment'])->middleware(['auth', 'verified'])->name('makepayment');
-Route::post('/create-order', [PaymentController::class, 'createOrder'])->middleware(['auth', 'verified'])->name('create-order');
-Route::post('/payment-callback', [PaymentController::class, 'paymentCallback'])->middleware(['auth', 'verified'])->name('payment-callback');
-Route::get('/thankyou', [PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('thankyou');
-Route::get('/myorderlist', [PageController::class, 'myorderlist'])->middleware(['auth', 'verified'])->name('myorderlist');
+    Route::get('/test', function(){
+        return view('admin.test');
+    });
 
-// Route::get('checkout', function () {
-// return 'check out page before login';
-// })->middleware('auth');
-
-// Route::get('/checkout', [PageController::class, 'checkout'])->name('checkout');
-Route::middleware('auth', 'verified')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
-    Route::post('/myaddress', [PageController::class, 'myaddressAdd'])->name('profile.addmyaddress');
-    Route::delete('/deletemyaddress', [PageController::class, 'deleteMyAddress'])->name('profile.deletemyaddress');
-    Route::patch('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
-    Route::delete('/myaddress', [PageController::class, 'myaddress'])->name('profile.myaddress');
+    // Home page
+    Route::get('/', [PageController::class, 'home'])->name('page.home');
+    
+    // product list
+    Route::get('/product_list',[PageController::class, 'product_list'])->name('product.list');
+    Route::get('/productdetail/{id}',[PageController::class, 'productdetail'])->name('page.showproduct');
+    
+    // add review
+    Route::post('/submit_review',[PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
+    
+    // cart
+    Route::middleware(['verified'])->get('/view_cart',[PageController::class, 'view_cart'])->name('page.cart');
+    Route::get('/checkout',[PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('page.checkout');
+    Route::post('/addtocart/{id}',[PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
+    Route::post('/removetocart/{id}',[PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
+    
+    // order list
+    Route::get('/myorder_list',[PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
+    Route::get('/view_order/{id}',[PageController::class, 'vieworder'])->middleware(['auth', 'verified'])->name('page.vieworder');
+    
+    // my address
+    Route::get('/myaddress',[AddressBookController::class, 'myaddress'])->middleware(['auth', 'verified'])->name('address.list');
+    Route::get('/deleteaddress/{delid}',[AddressBookController::class, 'deleteAddress'])->middleware(['auth', 'verified'])->name('address.delete');
+    Route::post('/addaddress',[AddressBookController::class, 'addAddress'])->middleware(['auth', 'verified'])->name('address.add');
+    
+    // payment process
+    Route::post('/create-order', [PaymentController::class, 'createOrder'])->middleware(['auth', 'verified'])->name('create-order');
+    Route::post('/payment-callback', [PaymentController::class, 'paymentCallback'])->middleware(['auth', 'verified'])->name('payment-callback');
+    
+    // Thank you page
+    Route::get('/thankyou',[PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('page.thankyou');
+    
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
+    
 });
+
 
 require __DIR__.'/auth.php';
 
 
-/*** Kalaiarasu added  *****/
-// Route::middleware(['auth'])->get('/', function () {
-//     return view('welcome');
-// })->name('home');
+// ADMIN CONTROLLER
 
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::middleware('adminAuth')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
-/**General user routes **/
-// Route::middleware(['auth', 'verified'])->get('/dashboard', [ProfileController::class, 'edit'])->name('dashboard');
+        // Category
+        Route::get('/category', [AdminController::class, 'categoryList'])->name('categorylist');
+        Route::post('/category/{id}', [AdminController::class, 'updateCategory'])->name('updatecategory');
+        Route::post('/category', [AdminController::class, 'addCategory'])->name('addcategory');
+        Route::get('/deletecategory/{id}', [AdminController::class, 'deleteCategory'])->name('deletecategory');
 
-if(Auth::user()){
-    // Route::get('/', [PageController::class, 'homepage'])->middleware(['auth', 'verified'])->name('home');
-    Route::middleware(['auth', 'verified'])->get('/', [PageController::class, 'homepage'])->name('home');
-}else{
-    Route::get('/', [PageController::class, 'homepage'])->name('home');
-}
+        // Brand
+        Route::get('/brand', [AdminController::class, 'brandList'])->name('brandlist');
+        Route::post('/brand/{brandid}', [AdminController::class, 'updateBrand'])->name('updatebrand');
+        Route::get('/deletebrand/{id}', [AdminController::class, 'deleteBrand'])->name('deletebrand');
+        Route::post('/brand', [AdminController::class, 'addBrand'])->name('addbrand');
+        
+        // Users
+        Route::get('/userlist', [AdminController::class, 'userList'])->name('userlist');
+        Route::get('/userview/{userid}', [AdminController::class, 'userView'])->name('userview');
 
-if(Auth::user()){
-    Route::middleware(['auth', 'verified'])->get('/cart', [PageController::class, 'cart'])->name('cart');
-}else{
-    Route::get('/cart', [PageController::class, 'cart'])->name('cart');
-}
+        // Product
+        Route::get('/product', [ProductController::class, 'listProduct'])->name('productlist');
+        Route::get('/product_new', [ProductController::class, 'newProduct'])->name('productnew');
+        Route::post('/add_product', [ProductController::class, 'addProduct'])->name('productadd');
+        Route::post('/update_product/{id}', [ProductController::class, 'updateProduct'])->name('productupdate');
+        Route::post('/add_productfield/{productid}', [ProductController::class, 'addProductField'])->name('productfield');
+        Route::post('/add_productimg/{productid}', [ProductController::class, 'addProductImg'])->name('addproductimg');
+        Route::get('/edit_product/{id}', [ProductController::class, 'editProduct'])->name('productedit');
+        Route::get('/product_delete/{id}', [ProductController::class, 'deleteProduct'])->name('productdelete');
 
-Route::get('/product_details/{prodid}', [PageController::class, 'productDetails'])->name('productdetail');
-Route::get('/product', [PageController::class, 'product'])->name('product');
+        // Orders
+        Route::get('/orderlist', [AdminController::class, 'orderList'])->name('orderlist');
+        Route::get('/orderview/{orderid}', [AdminController::class, 'orderView'])->name('orderview');
+        Route::post('/updateorderstatus/{orderid}', [AdminController::class, 'updateOrderStatus'])->name('updateorderstatus');
 
-Route::post('/savereview', [PageController::class, 'savereview'])->name('savereview');
-Route::post('/addtocart', [PageController::class, 'addtocart'])->name('addtocart');
-Route::post('/removetocart', [PageController::class, 'removetocart'])->name('removetocart');
-// Route::post('/removecart', [PageController::class, 'removecart'])->name('removecart');
-Route::post('/updatecart', [PageController::class, 'updatecart'])->name('updatecart');
+        // Website Data
+        Route::get('/websitedata', [AdminController::class, 'websiteData'])->name('websitedata');
+        Route::post('/websitedata', [AdminController::class, 'websiteDataUpdate'])->name('websitedataupdate');
 
-// routes/web.php
-Route::get('/admin', function () {
-    return redirect()->route('adminDashboardShow');
+        // test
+        Route::get('/test', function(){
+            return view('admin.test');
+        });
+
+    });
+    Route::get('/', [AdminController::class, 'login'])->name('login');
+    Route::get('/login', [AdminController::class, 'login']);
+    Route::post('/validatelogin', [AdminController::class, 'validateLogin'])->name('validatelogin');
+    Route::get('/logout', [AdminController::class, 'destroy'])->name('logout');
 });
 
-
-/**Admin routes **/
-Route::middleware('adminAuth')->prefix('admin')->group(function(){
-    Route::get('/dashboard', [AdminPageController::class, 'home'])->name('adminDashboardShow');
-    Route::get('/homebanner', [HomeBannerController::class, 'homeBanner'])->name('homebanner');
-    Route::delete('/homebanner/{id}', [HomeBannerController::class, 'deletebanner'])->name('deletebanner');
-    Route::post('/savehomebanner', [HomeBannerController::class, 'store'])->name('savehomebanner');
-    Route::get('/feesdetails', [AdminPageController::class, 'feesdetails'])->name('feesdetails');
-    Route::delete('/feesdetails/{id}', [AdminPageController::class, 'deletefeesdetails'])->name('deletefeesdetails');
-    Route::post('/savefeesdetails', [AdminPageController::class, 'savefeesdetails'])->name('savefeesdetails');
-    Route::prefix('category')->group(function(){
-        Route::get('/', [AdminPageController::class, 'list'])->name('admincategory');
-        Route::get('/new', [AdminPageController::class, 'create'])->name('newcategory');
-        Route::post('/store', [AdminPageController::class, 'store'])->name('savecategory');
-        Route::get('/edit/{id}', [AdminPageController::class, 'edit'])->name('editcategory');
-        Route::post('/update/{id}', [AdminPageController::class, 'update'])->name('updatecategory');
-    });
-    Route::prefix('products')->group(function(){
-        Route::get('/', [ProductController::class, 'list'])->name('productlist');
-        Route::get('/new', [ProductController::class, 'create'])->name('newproduct');
-        Route::post('/store', [ProductController::class, 'store'])->name('saveproduct');
-        Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('editproduct');
-        Route::post('/update/{id}', [ProductController::class, 'update'])->name('updateproduct');
-    });
-    Route::prefix('brand')->group(function(){
-        Route::get('/', [BrandController::class, 'list'])->name('brandlist');
-        Route::get('/new', [BrandController::class, 'create'])->name('newbrand');
-        Route::post('/store', [BrandController::class, 'store'])->name('savebrand');
-        Route::get('/edit/{id}', [BrandController::class, 'edit'])->name('editbrand');
-        Route::post('/update/{id}', [BrandController::class, 'update'])->name('updatebrand');
-    });
-    Route::prefix('order')->group(function(){
-        Route::get('/', [AdminPageController::class, 'orderlist'])->name('orderlist');
-        Route::get('/all', [AdminPageController::class, 'overallorderlist'])->name('overallorderlist');
-        Route::get('/edit/{id}', [AdminPageController::class, 'orderedit'])->name('editorder');
-        Route::post('/update/{id}', [AdminPageController::class, 'orderItemUpdate'])->name('updateorderitem');
-    });
-    
-    Route::get('/users', [AdminPageController::class, 'userlist'])->name('userlist');
-    Route::get('/edituser/{id}', [AdminPageController::class, 'useredit'])->name('useredit');
-
-    Route::get('/website', [AdminPageController::class, 'websitedata'])->name('website');
-    Route::delete('/website/{id}', [AdminPageController::class, 'deletewebsite'])->name('deletewebsite');
-    Route::post('/savewebsite', [AdminPageController::class, 'savewebsite'])->name('savewebsite');
-});

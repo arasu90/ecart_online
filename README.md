@@ -67,11 +67,13 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 
+
+
 ### Kalaiarasu Instruction ###
 - **[Referenece link https://medium.com/@abdullah.hasan.sajjad.rafi/how-to-create-a-laravel-authentication-system-for-multiple-users-by-using-user-roles-through-singl-2a4afa431441]**
 - **[Create a new project and enter the project folder]**
-composer create-project laravel/laravel ecart_app
-cd ecart_app
+composer create-project laravel/laravel ecart_online
+cd ecart_online
 - **[install the breeze authentication]**
 composer require laravel/breeze --dev
 php artisan breeze:install
@@ -91,24 +93,6 @@ AuthenticatedSessionController.php file added new custom function for login
 composer require intervention/image
 
 
-color replaced from to 
-
-#c5837c - #15b951d1
-
-#D19C97 - #119f45
-
-#c17a74 - #28a745
-
-#bd726b - #1e7e34
-
-rgba(209, 156, 151, 0.5) - rgba(90, 199, 77, 0.5)
-
-#ba6a62 - #17aa21
-
-rgba(183, 138, 135, 0.5) - rgba(135, 183, 154, 0.5)
-
-
-
 ### Important command new fresh
 
 composer update
@@ -122,3 +106,27 @@ php artisan storage:link
 php artisan migrate 
 
 php artisan db:seed
+
+- **[RazorPay package Installation]**
+composer require razorpay/razorpay
+
+app folder created common function trait and common class file 
+
+ln -s /path/to/your/admin-assets /path/to/laravel-project/public/admin-assets
+
+
+
+- **[Admin Layout Create]**
+
+ln -s /var/www/html/admin-assets /var/www/html/public/admin-assets
+
+php artisan make:component AdminLayout
+
+php artisan make:middleware AdminAuth
+
+--- register admin middleware in bootsrap/app.php file  --
+
+
+symlink create manual path
+
+ln -sf /home/u352542771/domains/mrspares.in/public_html/storage/app/public storage

@@ -1,10 +1,7 @@
-@props(['img_url'])
+@props(['image_url'])
 
-@php
-$classes = 'img-fluid';
-$fileName = pathinfo(public_path($img_url), PATHINFO_FILENAME);
-@endphp
-
-@if(file_exists(public_path($img_url)))
-<img src="{{ asset($img_url)}}" alt="{{$fileName}}"{{ $attributes->merge(['class' => $classes]) }}  />
+@if (file_exists(public_path($image_url)))
+    <div class="zoom-img"><img src="{{ asset($image_url) }}" alt="File Not Found" class="width-10 prod-detail-img" /></div>
+@else
+    <img src="{{ asset(env('NOIMAGE')) }}" alt="File Not Found" class="width-10" />
 @endif

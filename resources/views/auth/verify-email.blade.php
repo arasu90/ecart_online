@@ -15,15 +15,15 @@
                 <form method="POST" action="{{ route('verification.send') }}">
                     @csrf
                     <div>
-                        <x-primary-button>
+                        <x-primary-button class="btn-primary">
                             {{ __('Resend Verification Email') }}
                         </x-primary-button>
                     </div>
                 </form>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="float-right">
                     @csrf
-                    <x-secondary-button>
+                    <x-secondary-button class="mb-5" type="submit">
                         {{ __('Log Out') }}
                     </x-secondary-button>
                 </form>

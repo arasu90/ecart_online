@@ -1,199 +1,318 @@
 <x-admin-layout>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Edit Product
-                        @if(Session::has('error'))
-                        <span class="text-danger m-4" role="alert">
-                            {{ Session::get('error') }}
-                        </span>
-                        @endif
-                        @if(Session::has('success'))
-                        <span class="text-success m-4" role="alert">
-                            {{ Session::get('success') }}
-                        </span>
-                        @endif
-                        <a href="{{route('productlist')}}" class="btn btn-sm btn-warning pull-right">List</a>
-                    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><a href="javascript:void(0);" class="toggle-sidebar"><span class="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel"></span></a>{{ __('Product') }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="content-row">
+                @if(Session::has('success'))
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    {{ Session::get('success') }}
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{route('updateproduct', $product_data->id)}}" enctype='multipart/form-data'>
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6 col-lg-4">
-                                <div class="form-group">
-                                    <label for="category_name">Category Name<span class="text-danger" style="font-size: x-large;">*</span></label>
-                                    <select name="category_name" class="form-select form-control">
-                                        <option value="">Select</option>
-                                        @foreach($category_list as $category)
-                                            <option {{ ($product_data->category_id == $category->id) ? 'selected' : '' }}  value="{{ $category->id }}">{{ $category->category_name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('category_name')
-                                    <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_name">Product Name<span class="text-danger" style="font-size: x-large;">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="product_name"
-                                        name="product_name"
-                                        placeholder="Enter Product Name" value="{{old('product_name', $product_data->product_name) }}" />
-                                    @error('product_name')
-                                    <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_mrp">Product MRP<span class="text-danger" style="font-size: x-large;">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="product_mrp"
-                                        name="product_mrp"
-                                        placeholder="Enter Product MRP" value="{{old('product_mrp', $product_data->product_mrp) }}" />
-                                    @error('product_mrp')
-                                    <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_rate">Product Rate<span class="text-danger" style="font-size: x-large;">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="product_rate"
-                                        name="product_rate"
-                                        placeholder="Enter Product Rate" value="{{old('product_rate',$product_data->product_rate) }}" />
-                                    @error('product_rate')
-                                    <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_desc">Product Description</label>
-                                    <textarea class="form-control" id="product_desc" name="product_desc" rows="3">{{ $product_data->product_desc }}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_detail">Product Details</label>
-                                    <textarea class="form-control" id="product_detail" name="product_detail" rows="6">{{ $product_data->product_detail }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-lg-4">
-                                <div class="form-group">
-                                    <label for="product_img_1">Product Image 1<strong class="text-danger" style="font-size: x-large;">*</strong></label><br />
-                                    <input
-                                        type="file"
-                                        class="form-control-file mt-2"
-                                        name="product_img_1"
-                                        id="product_img_1" />
-                                    <span class="badge badge-black">Allowed type .jpeg, jpg, png</span>
-                                    @error('product_img_1')
-                                    <br /><small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_img_2">Product Image 2</label><br />
-                                    <input
-                                        type="file"
-                                        class="form-control-file mt-2"
-                                        name="product_img_2"
-                                        id="product_img_2" />
-                                    <span class="badge badge-black">Allowed type .jpeg, jpg, png</span>
-                                    @error('product_img_2')
-                                    <br /><small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_img_3">Product Image 3</label><br />
-                                    <input
-                                        type="file"
-                                        class="form-control-file mt-2"
-                                        name="product_img_3"
-                                        id="product_img_3" />
-                                    <span class="badge badge-black">Allowed type .jpeg, jpg, png</span>
-                                    @error('product_img_3')
-                                    <br /><small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_img_4">Product Image 4</label><br />
-                                    <input
-                                        type="file"
-                                        class="form-control-file mt-2"
-                                        name="product_img_4"
-                                        id="product_img_4" />
-                                    <span class="badge badge-black">Allowed type .jpeg, jpg, png</span>
-                                    @error('product_img_4')
-                                    <br /><small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="product_img_5">Product Image 5</label><br />
-                                    <input
-                                        type="file"
-                                        class="form-control-file mt-2"
-                                        name="product_img_5"
-                                        id="product_img_5" />
-                                    <span class="badge badge-black">Allowed type .jpeg, jpg, png</span>
-                                    @error('product_img_5')
-                                    <br /><small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="form-check">
-                                <div class="form-group">
-                                    <label>Status</label><br />
-                                    <div class="d-flex">
-                                        <div class="form-check">
-                                            <input
-                                                class="form-check-input"
-                                                type="radio"
-                                                name="status"
-                                                id="activestatus" value="1" {{ ($product_data->product_status =='1') ? 'checked' : '' }} />
-                                            <label
-                                                class="form-check-label"
-                                                for="activestatus">
-                                                Active
-                                            </label>
+                @endif
+
+                @if(Session::has('error'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    {{ Session::get('error') }}
+                </div>
+                @endif
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <div class="panel-title"><b>{{ __('Edit Product') }}</b>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form novalidate="" method="post" action="{{ route('admin.productupdate', $product_data->id)}}" role="form" class="form-horizontal">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="description">Brand</label>
+                                        <div class="col-md-6">
+                                            <select name="brand_id" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                <option value="">Select</option>
+                                                @foreach ($brand_list as $brand)
+                                                <option value="{{ $brand->id }}" @if($product_data->brand_id == $brand->id) selected @endif>{{ $brand->brand_name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('brand_id')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
                                         </div>
-                                        <div class="form-check">
-                                            <input
-                                                class="form-check-input"
-                                                type="radio"
-                                                name="status"
-                                                id="inactivestatus"
-                                                 value="0" {{ ($product_data->product_status =='0') ? 'checked' : '' }} />
-                                            <label
-                                                class="form-check-label"
-                                                for="inactivestatus">
-                                                InActive
-                                            </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="description">Category</label>
+                                        <div class="col-md-6">
+                                            <select name="category_id" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                <option value="">Select</option>
+                                                @foreach ($category_list as $category)
+                                                <option value="{{ $category->id }}" @if($product_data->category_id == $category->id) selected @endif >{{ $category->category_name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('category_id')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product Name</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Product Name" id="product_name" class="form-control" name="product_name" value="{{ $product_data->product_name }}">
+                                            @error('product_name')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product Details</label>
+                                        <div class="col-md-6">
+                                            <textarea class="form-control" name="product_detail" placeholder="Product Detail">{{ $product_data->product_detail }}</textarea>
+                                            @error('product_detail')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
-                                           
-                            </div>
-                            <div class="col-md-3 col-lg-4">
-                                @foreach($product_data->product_img as $img)
-                                <div class="form-group">
-                                    <label for="product_img_1">Product Image {{$loop->index + 1}}</label><br />
-                                        <x-img-tag img_url="{{ $img->image_name }}" style="max-width:40%;" />
-                                        @if($img->default_img == '1')
-                                        <span class='badge badge-success'>Default</span>
-                                        @else
-                                        <input  type="checkbox" class="checkbox" name="delete_img[]" value="{{ $img->id }}"/>Delete
-                                        
-                                        @endif
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product MRP</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Product MRP" id="product_mrp" class="form-control" name="product_mrp" value="{{ $product_data->product_mrp }}">
+                                            @error('product_mrp')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product Price</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Product Price" id="product_price" class="form-control" name="product_price" value="{{ $product_data->product_price }}">
+                                            @error('product_price')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product Tax</label>
+                                        <div class="col-md-6">
+                                            <select name="product_tax" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                <option value="0" @if($product_data->product_tax == 0) selected @endif >0%</option>
+                                                <option value="5" @if($product_data->product_tax == 5) selected @endif>5%</option>
+                                                <option value="12" @if($product_data->product_tax == 12) selected @endif>12%</option>
+                                                <option value="18" @if($product_data->product_tax == 18) selected @endif>18%</option>
+                                                <option value="28" @if($product_data->product_tax == 28) selected @endif>28%</option>
+                                            </select>
+                                            @error('product_tax')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Product Stock</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Product Stock" class="form-control" name="product_stock" value="{{ $product_data->product_stock }}">
+                                            @error('product_stock')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="description">Product Status</label>
+                                        <div class="col-md-6">
+                                            <select name="product_status" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                <option value="1" @if($product_data->product_status == 1) selected @endif >Active</option>
+                                                <option value="0" @if($product_data->product_status == 0) selected @endif>Inactive</option>
+                                            </select>
+                                            @error('product_status')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                @endforeach
                             </div>
-                            <div class="card-action">
-                                <x-primary-button class="btn btn-primary">{{ __('Submit') }}</x-primary-button>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <button class="btn btn-success" type="submit">Save</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="content-row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title"><b>{{ __('Add Product Image') }}</b>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form novalidate="" method="post" action="{{ route('admin.addproductimg', $product_data->id)}}" role="form" class="form-horizontal" enctype='multipart/form-data'>
+                            @csrf
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="description">Product Image</label>
+                                <div class="col-md-6">
+                                    <input type="file" name="product_img">
+                                    <p class="help-block">Please select image</p>
+                                    <div class="checkbox">
+                                        <input type="checkbox" name="default_img" id="flat-checkbox-1">
+                                        <label for="flat-checkbox-1">{{ __('  Is Default') }}</label>
+                                    </div>
+                                    @error('product_img')
+                                    <span class="text-danger" role="alert">{{ $message }}
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-4 col-md-6">
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Image</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($product_img_list as $img_list)
+                                    <tr>
+                                        <td>
+                                            {{ $loop->iteration }}
+                                            @if($img_list->default_img ==1)
+                                            <span class="badge badge-success">{{ __('Is Default') }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <x-img-tag image_url="{{ $img_list->product_img }}" />
+                                        </td>
+                                        <td>
+                                            <a href="{{ $img_list->id }}" class="btn btn-sm btn-danger">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5">No Records Found</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-row">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <div class="panel-title"><b>{{ __('Add Product Data Fields') }}</b>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form novalidate="" method="post" action="{{ route('admin.productfield', $product_data->id)}}" role="form" class="form-horizontal">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="description">Product Data Field Name</label>
+                                        <div class="col-md-6">
+                                            <select name="product_data_field_id" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                @forelse ($product_field_list as $field_list)
+                                                <option value="{{ $field_list->id }}">{{ $field_list->field_name }}</option>
+                                                @empty
+                                                <option value="">Select</option>
+                                                @endforelse
+                                            </select>
+                                            @error('product_data_field_id')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="description">Product Data Field Value</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Field Value" class="form-control" name="product_data_field_value">
+                                            @error('product_data_field_value')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <button class="btn btn-warning float-right" type="submit">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Field Name</th>
+                                        <th>Field Value</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($product_field_value_list as $field_value_list)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $field_value_list->product_data->field_name }}</td>
+                                        <td>{{ $field_value_list->field_value }}</td>
+                                        <td>
+                                            <a href="{{ $field_value_list->id }}" class="btn btn-sm btn-danger">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5">No Records Found</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- panel body -->
+    </div>
 </x-admin-layout>

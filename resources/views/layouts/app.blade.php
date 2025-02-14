@@ -1,37 +1,144 @@
+@inject('CommonClass', 'App\CommonClass')
+@php
+$website_data_value = $CommonClass->getWebsiteData();
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="en">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <title>E-Cart App</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <!-- Favicon -->
+    <link href="{{ asset('assets/img/favicon-standard.png') }}" rel="icon">
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-        
-    </body>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ asset('assets/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <style>
+        .pageLoader {
+            background: url("{{ asset('assets/img/load-33_256.gif') }}") no-repeat center center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: 9999999;
+            background-color: rgba(195, 101, 101, 0.55);
+
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 0.5rem !important;
+        }
+
+        .dropdown-menu {
+            min-width: 15rem !important;
+        }
+
+        .text-black {
+            color: black !important;
+        }
+
+        .toast-custom-box {
+            position: absolute;
+            top: 5%;
+            right: 5%;
+            min-width: 20rem;
+        }
+
+        @media (max-width:480px) {
+            .toast-custom-box {
+                position: absolute;
+                top: 10%;
+            }
+        }
+
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            /* Hide overflow for a clean carousel look */
+        }
+
+        .carousel-item {
+            flex: 0 0 100%;
+            /* Ensure each item takes full width of the carousel */
+            position: relative;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            /* Ensure image takes up full width of the carousel item */
+            height: 30rem;
+            /* Ensure image takes full height of the carousel item */
+            object-fit: fill;
+            /* Maintain the aspect ratio and cover the entire area */
+            object-position: center;
+            /* Keeps the image centered */
+            transition: all 0.3s ease;
+            /* Optional: Add smooth transition effect */
+        }
+
+        .product-card-img {
+            height: 20rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pageLoader" id="pageLoader"></div>
+    @include('include.topbar')
+
+    @include('include.navbar')
+
+    <main>
+        @include('include.alertbox')
+
+        {{ $slot }}
+    </main>
+
+    @include('include.footer')
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/lib/easing/easing.min.js') }}"></script>
+    <script src="{{ asset('assets/lib/owlcarousel/owl.carousel.min.js') }}"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="{{ asset('assets/mail/jqBootstrapValidation.min.js') }}"></script>
+    <script src="{{ asset('assets/mail/contact.js') }}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script>
+        $(window).on('beforeunload', function() {
+            $('#pageLoader').show();
+        });
+        $(window).on('unload', function() {
+            $('#pageLoader').hide(); // Ensure the loader is hidden when the page unloads
+        });
+        $(function() {
+            $('#pageLoader').hide();
+
+            $(".toast").fadeTo(2000, 500).slideUp(500, function() {
+                $(".toast").slideUp(500);
+            });
+        })
+    </script>
+    @stack('scripts')
+</body>
+
 </html>

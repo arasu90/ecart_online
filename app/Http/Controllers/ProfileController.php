@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CommonFunction;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,8 +32,6 @@ class ProfileController extends Controller
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
-
-        // dd($request->validated());
 
         $request->user()->save();
 

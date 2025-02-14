@@ -6,74 +6,63 @@
         });
     </script>
     @endpush
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">User List</span>
-                    <span> @if(Session::has('error'))
-                        <span class="text-danger" role="alert">
-                            <strong>{{ Session::get('error') }} </strong>
-                        </span>
-                        @endif
-                        @if(Session::has('success'))
-                        <span class="text-success" role="alert">
-                            <strong>{{ Session::get('success') }}</strong>
-                        </span>
-                        @endif</span>
-                </div>
-                <div class="card-body">
-
-                    <div class="table-responsive">
-                        <table
-                            id="basic-datatables"
-                            class="display table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>SlNo</th>
-                                    <th>UserName</th>
-                                    <th>Email</th>
-                                    <th>MobileNo</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($user_list as $list)
-                                <tr>
-                                    <td>{{ $loop->index + 1 }}</td>
-                                    <td>
-                                        @if($list->type == 'admin')
-                                            <span class="badge badge-warning">{{ $list->name }}</span>
-                                        @else
-                                            {{ $list->name }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ $list->email }}
-                                    </td>
-                                    <td>
-                                        {{ $list->mobileno }}
-                                    </td>
-                                    <td>
-                                        @php
-                                            $daa = ($list->deleted_at) ? 0 : 1;
-                                        @endphp
-                                        <span class="badge {{ config('appstatus.userstatus.'.$daa.'.color','badge-danger') }}">{{ config('appstatus.userstatus.'.$daa.'.name','Inactive') }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="form-button-action">
-                                            <a href="{{ route('useredit',$list->id) }}" data-bs-toggle="tooltip" title="View Users" class="btn btn-link btn-primary btn-lg" data-original-title="View User"><i class="fa fa-edit"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><a href="javascript:void(0);" class="toggle-sidebar"><span class="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel"></span></a>{{ __('User List') }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="content-row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <b>User List</b>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table id="basic-datatables" class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>User Name</th>
+                                        <th>User Email</th>
+                                        <th>User Mobile</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($user_list as $list)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            @if ($list->user_type == 'admin')
+                                                <span class="badge badge-info">{{ ucfirst($list->name) }}</span>
+                                            @else
+                                                {{ ucfirst($list->name) }}
+                                            @endif</td>
+                                        <td>{{ $list->email }}</td>
+                                        <td>{{ $list->mobile }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.userview',$list->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="glyphicon glyphicon-edit"></i>
+                                            </a>
+                                            <a href="{{ $list->id }}" class="btn btn-sm btn-danger">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- panel body -->
     </div>
 </x-admin-layout>

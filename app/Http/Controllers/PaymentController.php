@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CartMaster;
+use App\Models\CartItem;
 use App\Models\OrderItem;
 use App\Models\OrderMaster;
+use App\Models\PaymentHistory;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 use Razorpay\Api\Api;
+use App\CommonFunction;
 
 class PaymentController extends Controller
 {
+    use CommonFunction;
     public function createOrder(Request $request)
     {
+        
         $api = new Api(getenv('RAYZORPAY_API_KEY_ID'), getenv('RAYZORPAY_API_KEY_SECRET'));
-        $orderamt = session('orderamt');
-        $receipt = getenv('DEVNAME').Uuid::randomNumber();
 
-        $order_master_id = $request->input('order_master_id');
-        $cart_master_id = $request->input('cart_master_id');
+        CartItem::where('user_id', Auth::user()->id)->where('cart_status',1)->update(['cart_status' => 2]);
 
-        // dd($orderamt);
+        $orderamt = $this->getCartValue();
+        $receipt = "Kalai".Uuid::randomNumber();
         // Create an order
         $orderData = [
             'amount' => $orderamt * 100, // Amount is in paise
@@ -33,16 +34,11 @@ class PaymentController extends Controller
         ];
 
         try {
-
-            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 3]); // cart updated to order before payment
-            OrderMaster::where('id', $order_master_id)->update(['order_status' => 2, 'payment_status' => 2]);
-            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 2]);
-
             Log::channel('payment')->info('create order API data', [
                 'user_id' => Auth::user()->id,
                 'orderamt' => $orderamt,
                 'currency' => 'INR',
-                'receipt' => $receipt
+                'receipt' => $receipt,
             ]);
             
             $order = $api->order->create($orderData);
@@ -56,24 +52,22 @@ class PaymentController extends Controller
                 'status' => 'success',
             ]);
 
+            
             return response()->json([
                 'id' => $order->id,
                 'amount' => $order->amount,
                 'currency' => $order->currency,
+                'receipt' => $receipt,
             ]);
 
         } catch (\Exception $e) {
-
-            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 6]); // incase failed respose update 6 all status
-            OrderMaster::where('id', $order_master_id)->update(['order_status' => 6, 'payment_status' => 2]);
-            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 6]);
 
             Log::channel('payment')->error('create order failed', [
                 'user_id' => Auth::user()->id,
                 'orderamt' => $orderamt,
                 'currency' => 'INR',
                 'receipt' => $receipt,
-                'amount' => $e->getMessage(),
+                'errormsg' => $e->getMessage(),
                 'status' => 'failed 500',
             ]);
             
@@ -91,39 +85,59 @@ class PaymentController extends Controller
         $paymentId = $request->input('razorpay_payment_id');
         $orderId = $request->input('razorpay_order_id');
         $signature = $request->input('razorpay_signature');
-        $order_master_id = $request->input('order_master_id');
-        $cart_master_id = $request->input('cart_master_id');
 
+        $data['razorpay_payment_id'] = $paymentId;
+        $data['razorpay_order_id'] = $orderId;
+        $data['razorpay_signature'] = $signature;
+        $data['create_order_amt'] = $request->input('amount');
+        $data['create_order_id'] = $request->input('order_id');
+        $data['create_order_currency_type'] = $request->input('currency');
+        $data['create_order_receipt'] = $request->input('receipt');
+        $data['address_id'] = $request->input('address_id');
         
         // Verify the payment signature
         $api = new Api(getenv('RAYZORPAY_API_KEY_ID'), getenv('RAYZORPAY_API_KEY_SECRET'));
 
         try {
+            $payment_data = $api->payment->fetch($paymentId);
+            $paymentMode = $payment_data->method;
+
             $api->utility->verifyPaymentSignature([
                 'razorpay_order_id' => $orderId,
                 'razorpay_payment_id' => $paymentId,
                 'razorpay_signature' => $signature,
             ]);
-
-            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 5]); // cart updated to order
-            OrderMaster::where('id', $order_master_id)->update(['order_status' => 3, 'payment_status' => 3, 'payment_mode'=>'RazorPay','payment_reference_no'=>$paymentId]);
-            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 3]);
             
+            $payment_data = $api->payment->fetch($paymentId);
+            $paymentMode = $payment_data->method;
+
             Log::channel('payment')->error('payment callback success', [
                 'user_id' => Auth::user()->id,
                 'razorpay_order_id' => $orderId,
                 'razorpay_payment_id' => $paymentId,
                 'razorpay_signature' => $signature,
                 'status' => 'success',
+                'paymentMode' => $paymentMode,
+                'payment_data' => var_export($payment_data, true),
             ]);
 
-            Session::put('thankyou_success',"Successfully");
+            CartItem::where('user_id', Auth::user()->id)->where('cart_status',2)->update(['cart_status' => 3]);
+
+            $data['payment_mode'] = $paymentMode;
+            
+            $ordermaster_id = $this->insertOrders($data);
+
+            $data['order_date'] = date('Y-m-d H:i:s');
+            $data['order_master_id'] = $ordermaster_id;
+            $data['razorpay_status'] = 'success';
+            $data['razorpay_message'] = 'success';
+            $data['payment_status'] = '2';
+            $this->insertPaymentHistory($data);
+            
+
+            // Session::put('thankyou_success',"Successfully");
             return response()->json(['status' => 'success','message'=>'success']);
         } catch (\Exception $e) {
-
-            CartMaster::where('id', $cart_master_id)->update(['cart_status' => 4]); // cart updated to order
-            OrderMaster::where('id', $order_master_id)->update(['order_status' => 4, 'payment_status' => 4]);
-            OrderItem::where('order_id', $order_master_id)->update(['order_status' => 4]);
 
             Log::channel('payment')->error('payment callback failed', [
                 'user_id' => Auth::user()->id,
@@ -131,31 +145,120 @@ class PaymentController extends Controller
                 'razorpay_payment_id' => $paymentId,
                 'razorpay_signature' => $signature,
                 'status' => 'failed',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'payment_data' => var_export($payment_data, true),
             ]);
 
-            Session::put('thankyou_failed',"failed order payment");
+            $data['order_date'] = '';
+            $data['order_master_id'] = '0';
+            $data['razorpay_status'] = 'failure';
+            $data['razorpay_message'] = $e->getMessage();
+            $data['payment_status'] = '3';
+            $data['payment_mode'] = 'failed';
+            
+            $this->insertPaymentHistory($data);
+
+            // Session::put('thankyou_failed',"failed order payment");
             return response()->json(['status' => 'failure', 'message' => $e->getMessage()]);
         }
-
-        
     }
 
-    public function makepayment(Request $request)
+    public function getCartValue()
     {
-        Log::channel('payment')->info('Makepayment Page: ', [
+        $cart_items = CartItem::where('user_id', Auth::user()->id)->where('cart_status',2)->get();
+        $subtotal = 0;
+        $shipping = 50;
+        foreach ($cart_items as $value) {
+            $value->total_value = $value->product_qty * $value->product->product_price;
+            $subtotal += $value->total_value;
+        }
+        $total_value = $subtotal + $shipping;
+        Log::channel('payment')->info('total val'.$total_value);
+        return $total_value;
+    }
+
+    public function insertPaymentHistory($data):void
+    {
+        PaymentHistory::create([
             'user_id' => Auth::user()->id,
-            'requested_id' => $request->input('makeorder'),
-            'ordernumber' => $request->input('accessorder')
+            'order_master_id' => $data['order_master_id'],
+            'order_date' => $data['order_date'],
+            'create_order_id' => $data['create_order_id'],
+            'create_order_amt' => $data['create_order_amt']/100,
+            'create_order_currency_type' => $data['create_order_currency_type'],
+            'create_order_receipt' => $data['create_order_receipt'],
+            'razorpay_payment_id' => $data['razorpay_payment_id'],
+            'razorpay_order_id' => $data['razorpay_order_id'],
+            'razorpay_signature' => $data['razorpay_signature'],
+            'razorpay_status' => $data['razorpay_status'],
+            'razorpay_message' => $data['razorpay_message'],
+            'payment_mode' => $data['payment_mode'],
+            'payment_status' => $data['payment_status'],
         ]);
-        $ordermaster = OrderMaster::findorfail($request->input('makeorder'));
-        Session::put('orderamt', $ordermaster->total_amt);
-        Log::channel('payment')->info('Makepayment DB: ', [
-            'user_id' => Auth::user()->id,
-            'requested_id' => $request->input('makeorder'),
-            'ordernumber' => $request->input('accessorder'),
-            'ordermaster' => $ordermaster,
-        ]);
-        return view('page.makepayment', compact('ordermaster'));
+    }
+
+    public function insertOrders($data)
+    {
+        $billing_address = $this->getAddressByID($data['address_id']);
+        $ordermaster = new OrderMaster();
+        $ordermaster->user_id = Auth::user()->id;
+        $ordermaster->order_date = date('Y-m-d H:i:s');
+        $ordermaster->payment_mode = $data['payment_mode'];
+        $ordermaster->payment_reference_no = $data['razorpay_payment_id'];
+        $ordermaster->billing_details = $billing_address;
+        $ordermaster->order_status = 1;
+        $ordermaster->payment_status = 1;
+        $ordermaster->save();
+
+        $over_all_item_value = 0;
+        $over_all_discount_amt = 0;
+        $over_all_sub_total = 0;
+        $over_all_tax_amt = 0;
+        $over_all_total_amt = 0;
+        $over_all_shipping_amt = 50;
+        $over_all_net_total_amt = 0;
+        $cart_items = CartItem::with('product')->where('user_id', Auth::user()->id)->where('cart_status',3)->get();
+        foreach ($cart_items as $value) {
+            $orderitems = new OrderItem();
+            $orderitems->order_master_id = $ordermaster->id;
+            $orderitems->user_id = Auth::user()->id;
+            $orderitems->cart_id = $value->id;
+            $orderitems->order_date = date('Y-m-d H:i:s');
+            $orderitems->product_id = $value->product_id;
+            $orderitems->product_name = $value->product->product_name;
+            $orderitems->product_qty = $value->product_qty;
+            $orderitems->product_mrp = $value->product->product_mrp;
+            $orderitems->product_price = $value->product->product_price;
+
+            $normal_price = $this->exclusiveProductPrice($value->product->product_price, $value->product->product_tax);
+
+            $orderitems->item_value = $normal_price * $value->product_qty;
+            $orderitems->discount_per = '0';
+            $orderitems->discount_amt = '0';
+            $orderitems->sub_total = $orderitems->item_value - $orderitems->discount_amt;
+            $orderitems->tax_per = $value->product->product_tax;
+            $orderitems->tax_amt = $value->product->product_tax * $orderitems->item_value/100;
+            $orderitems->total_amt = $orderitems->sub_total + $orderitems->tax_amt;
+            $orderitems->order_status = 1;
+            $orderitems->payment_status = 1;
+            $orderitems->payment_mode = $data['payment_mode'];
+            $orderitems->payment_reference_no = $data['razorpay_payment_id'];
+            $orderitems->billing_details = $billing_address;
+
+            $orderitems->save();
+
+            $over_all_item_value += $orderitems->item_value;
+            $over_all_discount_amt += $orderitems->discount_amt;
+            $over_all_sub_total += $orderitems->sub_total;
+            $over_all_tax_amt += $orderitems->tax_amt;
+            $over_all_total_amt += $orderitems->total_amt;
+        }
+        $over_all_net_total_amt += $over_all_total_amt + $over_all_shipping_amt;
+
+        OrderMaster::where('id', $ordermaster->id)->update(['item_value' => $over_all_item_value, 'discount_amt' => $over_all_discount_amt,'sub_total' => $over_all_sub_total, 'tax_amt'=>$over_all_tax_amt, 'total_amt' => $over_all_total_amt, 'shipping_amt' => $over_all_shipping_amt, 'net_total_amt' => $over_all_net_total_amt]);
+
+        CartItem::where('user_id', Auth::user()->id)->where('cart_status',3)->update(['order_id' => $ordermaster->id,'cart_status' => 4]);
+
+        return $ordermaster->id;
     }
 }

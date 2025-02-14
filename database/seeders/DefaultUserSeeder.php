@@ -11,22 +11,15 @@ class DefaultUserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Added by Kalaiarasu for setting up default Users
      */
     public function run(): void
     {
-        $userObj = new User();
-        $userObj->name = 'User';
-        $userObj->email = 'user@user.com';
-        $userObj->password = Hash::make('user12345');
-        $userObj->type = 'user';
-        $userObj->save();
-
         $adminObj = new User();
         $adminObj->name = 'Admin';
         $adminObj->email = 'admin@admin.com';
-        $adminObj->password = Hash::make('admin54321');
-        $adminObj->type = 'admin';
+        $adminObj->password = Hash::make('admin12345');
+        $adminObj->user_type = 'admin';
+        $adminObj->mobile = '9876543210';
         $adminObj->save();
     }
 }

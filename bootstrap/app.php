@@ -11,9 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // kalaiarasu Middleware registered
         $middleware->alias([
             'adminAuth' => \App\Http\Middleware\AdminAuth::class,
+            'defaultParameter' => \App\Http\Middleware\AddDefaultParameter::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
