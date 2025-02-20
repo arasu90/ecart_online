@@ -98,6 +98,7 @@ class PageController extends Controller
 
     public function checkout()
     {
+        $cart_count = $this->getCartCount();
         if ($cart_count == 0) {
             return redirect()->route('page.home')->with('error', 'No Product in Cart');
         }

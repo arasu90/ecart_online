@@ -130,3 +130,4 @@ php artisan make:middleware AdminAuth
 symlink create manual path
 
 ln -sf /home/u352542771/domains/mrspares.in/public_html/storage/app/public storage
+ln -sf /home/u352542771/domains/mrspares.in/public_html/admin-assets admin-assets

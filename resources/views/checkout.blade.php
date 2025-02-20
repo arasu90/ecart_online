@@ -135,7 +135,7 @@
                 key: '{{ getenv("RAYZORPAY_API_KEY_ID") }}', // Use the correct key ID
                 amount: orderData.amount, // Amount is in currency subunits (in paise)
                 currency: orderData.currency,
-                name: 'Kalaiarasu card', // user name
+                name: '{{ Auth::user()->name }}', // user name
                 image: '{{ getenv("PAYMENTLOGO") }}', // img url online path
                 description: 'Test Transaction',
                 order_id: orderData.id, // Pass the order ID generated in the previous step
@@ -165,9 +165,9 @@
                     });
                 },
                 prefill: { // who make the payment that user details
-                    name: 'Kalaiarasu user',
-                    email: 'admin@admin.com',
-                    contact: '9003999590'
+                    name: '{{ Auth::user()->name }}',
+                    email: '{{ Auth::user()->email }}',
+                    contact: '{{ Auth::user()->mobile }}'
                 },
                 theme: {
                     color: '#F37254'

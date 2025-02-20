@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
@@ -32,22 +33,27 @@ class AdminController extends Controller
         $thisMonthOrders = OrderMaster::where('order_date', '>=', date('Y-m-01 00:00:00'))->count();
         $thisMonthOrdersValue = OrderMaster::where('order_date', '>=', date('Y-m-01 00:00:00'))->sum('net_total_amt');
 
-        $products = OrderItem::join('products', 'products.id', '=', 'order_items.product_id')
-            ->groupBy('products.id')
-            ->orderby('products.id')
-            ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
-            ->get();
-        $barChartProductName = $products->pluck('product_name');
-        $barChartProductQty = $products->pluck('total_qty');
-
+        $ordercount = OrderItem::count();
+        $barChartProductName = 0;
+        $barChartProductQty = 0;
+        if ($ordercount) {
+            $products = OrderItem::join('products', 'products.id', '=', 'order_items.product_id')
+                ->groupBy('products.id')
+                ->orderby('products.id')
+                ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
+                ->get();
+            $barChartProductName = $products->pluck('product_name');
+            $barChartProductQty = $products->pluck('total_qty');
+        }
+        
         $orders = OrderItem::groupBy('order_master_id')
-        ->orderby('total_amt')
-        ->select(DB::raw('count(product_id) as total_product'), DB::raw('sum(total_amt) as total_amt'))
-        ->get();
+            ->orderby('total_amt')
+            ->select(DB::raw('count(product_id) as total_product'), DB::raw('sum(total_amt) as total_amt'))
+            ->get();
 
         $barChartOrderValue = $orders->pluck('total_amt');
         $barChartOrderItem = $orders->pluck('total_product');
-        // dd($barChartProductQty);
+
         return view('admin.index', compact('todayOrders', 'todayOrdersValue', 'thisMonthOrdersValue', 'thisMonthOrders', 'barChartProductName', 'barChartProductQty', 'barChartOrderValue', 'barChartOrderItem'));
     }
 
@@ -104,15 +110,14 @@ class AdminController extends Controller
     public function deleteCategory($id)
     {
         $category = Category::find($id);
-        try{
-            if(!$category)
-            {
+        try {
+            if (!$category) {
                 throw new \Exception('Invalid Category ID');
             }
 
             $category->delete();
             return redirect()->route('admin.categorylist')->with('success', 'Category deleted successfully');
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -169,15 +174,14 @@ class AdminController extends Controller
     public function deleteBrand($brandid)
     {
         $brands = Brand::find($brandid);
-        try{
-            if(!$brands)
-            {
+        try {
+            if (!$brands) {
                 throw new \Exception('Invalid Brand ID');
             }
 
             $brands->delete();
             return redirect()->route('admin.brandlist')->with('success', 'Brand deleted successfully');
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -293,5 +297,22 @@ class AdminController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('admin.login');
+    }
+
+    public function updateAdminPassword(Request $request)
+    {
+        $request->validate([
+            'newpassword' => 'required|max:50|string',
+            'new_confirm_password' => 'required|max:50|string|required_with:newpassword|same:newpassword',
+        ], [
+            'new_confirm_password.same' => "New Password & Confirm Password not match"
+        ]);
+
+        $profileupdate = User::where('email', 'admin@admin.com')->update(['password' => Hash::make($request->input('newpassword'))]);
+        if ($profileupdate) {
+            return redirect()->route('admin.changepassword')->with('success', 'Profile Passerd Updated Successfully');
+        } else {
+            return redirect()->route('admin.changepassword')->with('error', 'Failed to update');
+        }
     }
 }
