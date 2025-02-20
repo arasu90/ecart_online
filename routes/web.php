@@ -6,56 +6,67 @@ use App\Http\Controllers\AddressBookController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('defaultParameter')->group(function () {
 
-    Route::get('/test', function(){
+    Route::get('/test', function () {
         return view('admin.test');
     });
 
-    // Home page
-    Route::get('/', [PageController::class, 'home'])->name('page.home');
-    
-    // product list
-    Route::get('/product_list',[PageController::class, 'product_list'])->name('product.list');
-    Route::get('/productdetail/{id}',[PageController::class, 'productdetail'])->name('page.showproduct');
-    
+    if (Auth::user()) {
+        // Home page
+        Route::middleware(['auth', 'verified'])->get('/', [PageController::class, 'home'])->name('page.home');
+
+        // product list
+        Route::middleware(['verified'])->get('/product_list', [PageController::class, 'product_list'])->name('product.list');
+        Route::middleware(['verified'])->get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
+    } else {
+        // Home page
+        Route::get('/', [PageController::class, 'home'])->name('page.home');
+
+        // product list
+        Route::get('/product_list', [PageController::class, 'product_list'])->name('product.list');
+        Route::get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
+    }
     // add review
-    Route::post('/submit_review',[PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
-    
+    Route::middleware(['verified'])->post('/submit_review', [PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
+
     // cart
-    Route::middleware(['verified'])->get('/view_cart',[PageController::class, 'view_cart'])->name('page.cart');
-    Route::get('/checkout',[PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('page.checkout');
-    Route::post('/addtocart/{id}',[PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
-    Route::post('/removetocart/{id}',[PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
-    
+    Route::middleware(['verified'])->get('/view_cart', [PageController::class, 'view_cart'])->name('page.cart');
+    Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('page.checkout');
+    Route::post('/addtocart/{id}', [PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
+    Route::post('/removetocart/{id}', [PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
+
     // order list
-    Route::get('/myorder_list',[PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
-    Route::get('/view_order/{id}',[PageController::class, 'vieworder'])->middleware(['auth', 'verified'])->name('page.vieworder');
-    
+    Route::get('/myorder_list', [PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
+    Route::get('/view_order/{id}', [PageController::class, 'vieworder'])->middleware(['auth', 'verified'])->name('page.vieworder');
+
     // my address
-    Route::get('/myaddress',[AddressBookController::class, 'myaddress'])->middleware(['auth', 'verified'])->name('address.list');
-    Route::get('/deleteaddress/{delid}',[AddressBookController::class, 'deleteAddress'])->middleware(['auth', 'verified'])->name('address.delete');
-    Route::post('/addaddress',[AddressBookController::class, 'addAddress'])->middleware(['auth', 'verified'])->name('address.add');
-    
+    Route::get('/myaddress', [AddressBookController::class, 'myaddress'])->middleware(['auth', 'verified'])->name('address.list');
+    Route::get('/deleteaddress/{delid}', [AddressBookController::class, 'deleteAddress'])->middleware(['auth', 'verified'])->name('address.delete');
+    Route::post('/addaddress', [AddressBookController::class, 'addAddress'])->middleware(['auth', 'verified'])->name('address.add');
+
     // payment process
     Route::post('/create-order', [PaymentController::class, 'createOrder'])->middleware(['auth', 'verified'])->name('create-order');
     Route::post('/payment-callback', [PaymentController::class, 'paymentCallback'])->middleware(['auth', 'verified'])->name('payment-callback');
-    
+
     // Thank you page
-    Route::get('/thankyou',[PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('page.thankyou');
-    
-    Route::middleware('auth')->group(function () {
+    Route::get('/thankyou', [PageController::class, 'thankyou'])->middleware(['auth', 'verified'])->name('page.thankyou');
+    Route::get('/terms', function () {
+        return view('terms_conditions');
+    })->name('page.terms');
+
+    Route::middleware('auth', 'verified')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
-    
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 // ADMIN CONTROLLER
@@ -76,7 +87,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/brand/{brandid}', [AdminController::class, 'updateBrand'])->name('updatebrand');
         Route::get('/deletebrand/{id}', [AdminController::class, 'deleteBrand'])->name('deletebrand');
         Route::post('/brand', [AdminController::class, 'addBrand'])->name('addbrand');
-        
+
         // Users
         Route::get('/userlist', [AdminController::class, 'userList'])->name('userlist');
         Route::get('/userview/{userid}', [AdminController::class, 'userView'])->name('userview');
@@ -99,16 +110,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Website Data
         Route::get('/websitedata', [AdminController::class, 'websiteData'])->name('websitedata');
         Route::post('/websitedata', [AdminController::class, 'websiteDataUpdate'])->name('websitedataupdate');
+        
+        // change Password
+        Route::get('/changepassword', function(){
+            return view('admin.changepassword');
+        })->name('changepassword');
+        Route::post('/changepassword', [AdminController::class, 'updateAdminPassword'])->name('changepassword');
 
         // test
-        Route::get('/test', function(){
+        Route::get('/test', function () {
             return view('admin.test');
         });
-
     });
     Route::get('/', [AdminController::class, 'login'])->name('login');
     Route::get('/login', [AdminController::class, 'login']);
     Route::post('/validatelogin', [AdminController::class, 'validateLogin'])->name('validatelogin');
     Route::get('/logout', [AdminController::class, 'destroy'])->name('logout');
 });
-

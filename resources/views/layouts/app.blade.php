@@ -13,8 +13,8 @@ $website_data_value = $CommonClass->getWebsiteData();
     <meta content="Free HTML Templates" name="description">
 
     <!-- Favicon -->
-    <link href="{{ asset('assets/img/favicon-standard.png') }}" rel="icon">
-
+    <link href="{{ asset('assets/img/new-design.png') }}" rel="icon">
+    <link rel="bookmark" href="{{ asset('assets/img/logo.png') }}" />
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">

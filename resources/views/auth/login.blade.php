@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col col-md-3 offset-md-4 px-4">
+            <div class="col col-md-3 offset-md-4 px-4 mb-4">
                 <div class="flex items-center justify-end mt-4">
 
                     <x-primary-button class="btn btn-block btn-primary font-weight-bold my-3 py-3">

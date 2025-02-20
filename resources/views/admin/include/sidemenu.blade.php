@@ -39,6 +39,14 @@
         </a>
     </li>
     <li class="list-group-item">
+        <a href="{{ route('admin.changepassword') }}">
+            <i class="glyphicon glyphicon-cog"></i>{{ __('Change Password') }}
+        </a>
+    </li>
+    <li class="list-group-item">
+        &nbsp;
+    </li>
+    <li class="list-group-item">
         <a href="{{ env('APP_URL') }}" target="_blank">
             <i class="glyphicon glyphicon-globe"></i>{{ __('Goto Website') }}
         </a>

@@ -3,7 +3,7 @@
     <div class="row align-items-center py-1 px-xl-5">
         <div class="col-lg-3 d-none d-lg-block">
             <a href="{{ route('page.home') }}" class="text-decoration-none">
-                <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">E</span>Shopper</h1>
+                <img style="background-color:#fff; border-radius:40px;height:4rem;" src="{{ asset('assets/img/logo.png') }}" alt="logo">
             </a>
         </div>
         <div class="col-lg-6 col-6 text-left">
