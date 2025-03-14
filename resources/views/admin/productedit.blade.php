@@ -231,6 +231,7 @@
                 <div class="panel panel-warning">
                     <div class="panel-heading">
                         <div class="panel-title"><b>{{ __('Add Product Data Fields') }}</b>
+                        <a href="{{route('admin.prodDataList')}}" class="btn btn-sm btn-primary float-right">Add Fields</a>
                         </div>
                         <div class="panel-options">
                             <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>

@@ -18,9 +18,5 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
     <style>
-      body
-      {
-        font-size: 20px !important;
-      }
     </style>
 </head>

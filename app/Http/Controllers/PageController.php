@@ -22,6 +22,8 @@ class PageController extends Controller
     public function home()
     {
         $img_carousel = array('0' => array('img' => 'assets/img/carousel-1.jpg', 'text1' => '10% Off Your First Order', 'text2' => 'Fashionable Dress', 'link' => "3"), '1' => array('img' => 'assets/img/carousel-2.jpg', 'text1' => '13% Off Your First Order', 'text2' => 'Reasonable Price', 'link' => "4"));
+        
+        $img_carousel = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(5)->get();
 
         $category_list = Category::with('product')->where('category_status', '1')->limit(6)->get();
 

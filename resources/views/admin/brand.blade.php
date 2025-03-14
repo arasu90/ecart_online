@@ -44,7 +44,7 @@
                                     <div class="form-group">
                                         <label class="col-md-4 control-label">Brand Name</label>
                                         <div class="col-md-8">
-                                            <input type="text" placeholder="Enter Brand Name" id="brand_name" class="form-control" name="brand_name" value="{{ $brand_data->brand_name }}">
+                                            <input type="text" placeholder="Enter Brand Name" id="brand_name" class="form-control" name="brand_name" value="{{ old('brand_name',$brand_data->brand_name) }}">
                                             @error('brand_name')
                                             <span class="text-danger" role="alert">{{ $message }}
                                             </span>
@@ -96,7 +96,7 @@
                             <div class="form-group">
                                 <label class="col-md-2 control-label">Brand Name</label>
                                 <div class="col-md-3">
-                                    <input type="text" placeholder="Enter Brand Name" id="brand_name" class="form-control" name="brand_name">
+                                    <input type="text" placeholder="Enter Brand Name" id="brand_name" class="form-control" name="brand_name" value="{{old('brand_name')}}">
                                     @error('brand_name')
                                     <span class="text-danger" role="alert">{{ $message }}
                                     </span>

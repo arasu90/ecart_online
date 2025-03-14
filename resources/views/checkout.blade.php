@@ -136,7 +136,7 @@
                 amount: orderData.amount, // Amount is in currency subunits (in paise)
                 currency: orderData.currency,
                 name: '{{ Auth::user()->name }}', // user name
-                image: '{{ getenv("PAYMENTLOGO") }}', // img url online path
+                image: '{{ asset(getenv("PAYMENTLOGO")) }}', // img url online path
                 description: 'Test Transaction',
                 order_id: orderData.id, // Pass the order ID generated in the previous step
                 handler: function(response) {

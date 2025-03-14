@@ -94,6 +94,31 @@ $website_data_value = $CommonClass->getWebsiteData();
         .product-card-img {
             height: 20rem;
         }
+    .text-primary{
+        color: #a268e1 !important
+    }
+    a {
+        color: #8968f2;
+    }
+
+    a:hover{
+        color: #de6cbe;
+    }
+
+    .product-item .btn:hover {
+    color: #de6cbe !important;
+}.btn-primary {
+    color: #212529;
+    background-color: #a268e1;
+    border-color: #a268e1;
+
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: #de6cbe;
+    border-color: #de6cbe;
+}
+
     </style>
 </head>
 

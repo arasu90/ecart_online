@@ -160,4 +160,56 @@ class ProductController extends Controller
 
         return redirect()->route('admin.productedit', $productid)->with('success', 'Product Image added successfully');
     }
+
+    public function prodDataList(Request $request)
+    {
+        $datafield_data = ProductData::find($request->input('datafield_id'));
+        $datafield_list = ProductData::get();
+        return view('admin.product_data_field', compact('datafield_data', 'datafield_list'));
+    }
+
+    public function addprodData(Request $request)
+    {
+        $request->validate([
+            'datafield_name' => 'required|max:100|string',
+            'datafield_status' => 'required',
+        ]);
+        // dd($request);
+        $datafield = new ProductData();
+        $datafield->field_name = $request->input('datafield_name');
+        $datafield->field_status = ($request->input('datafield_status')) ? 1 : 0;
+        $datafield->save();
+
+        return redirect()->route('admin.prodDataList')->with('success', 'Data Field added successfully');
+    }
+
+    public function updateprodData($datafieldid, Request $request)
+    {
+        // dd($request);
+        $request->validate([
+            'datafield_name' => 'required|max:100|string',
+            'datafield_status' => 'required',
+        ]);
+        $datafield = ProductData::findOrFail($datafieldid);
+        $datafield->field_name = $request->input('datafield_name');
+        $datafield->field_status = ($request->input('datafield_status')) ? 1 : 0;
+        $datafield->save();
+
+        return redirect()->route('admin.prodDataList', ['datafield_id' => $datafieldid])->with('success', 'Data Field updated successfully');
+    }
+
+    public function deleteprodData($id)
+    {
+        $datafield = ProductData::find($id);
+        try {
+            if (!$datafield) {
+                throw new \Exception('Invalid Data Field ID');
+            }
+
+            $datafield->delete();
+            return redirect()->route('admin.prodDataList')->with('success', 'Data Field deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
 }

@@ -2,7 +2,7 @@
 <x-admin-layout>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><a href="javascript:void(0);" class="toggle-sidebar"><span class="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel"></span></a>{{ __('Category') }}</h3>
+            <h3 class="panel-title"><a href="javascript:void(0);" class="toggle-sidebar"><span class="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel"></span></a>{{ __('Product Data Field') }}</h3>
         </div>
         <div class="panel-body">
             <div class="content-row">
@@ -17,14 +17,15 @@
                     {{ Session::get('error') }}
                 </div>
                 @endif
-                <div class="panel panel-default">
+
+                <div class="panel panel-info">
                     <div class="panel-heading">
-                        @isset($category_data)
-                        <div class="panel-title"><b>{{ __('Edit Category') }}</b>
-                            <a href="{{ route('admin.categorylist') }}" class="btn btn-sm btn-primary">Add New</a>
+                        @isset($brand_data)
+                        <div class="panel-title"><b>{{ __('Edit Product') }}</b>
+                            <a href="{{ route('admin.prodDataList') }}" class="btn btn-sm btn-primary">Add New</a>
                         </div>
                         @else
-                        <div class="panel-title"><b>{{ __('Add Category') }}</b>
+                        <div class="panel-title"><b>{{ __('Add Product') }}</b>
                         </div>
                         @endisset
                         <div class="panel-options">
@@ -34,40 +35,29 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        @isset($category_data)
-                        <form novalidate="" action="{{ route('admin.updatecategory', $category_data->id)}}" method="post" role="form" class="form-horizontal" enctype='multipart/form-data'>
+                        @isset($datafield_data)
+                        <form novalidate="" action="{{ route('admin.updateprodData', $datafield_data->id)}}" method="post" role="form" class="form-horizontal" enctype='multipart/form-data'>
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Category Name</label>
+                                        <label class="col-md-4 control-label">Data Field Name</label>
                                         <div class="col-md-8">
-                                            <input type="text" placeholder="Enter Category Name" id="category_name" class="form-control" name="category_name" value="{{ old('category_name',$category_data->category_name) }}">
-                                            @error('category_name')
+                                            <input type="text" placeholder="Enter Data Field Name" id="datafield_name" class="form-control" name="datafield_name" value="{{ old('datafield_name',$datafield_data->field_name) }}">
+                                            @error('datafield_name')
                                             <span class="text-danger" role="alert">{{ $message }}
                                             </span>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Category Img</label>
+                                        <label class="col-md-4 control-label" for="description">Data Field Status</label>
                                         <div class="col-md-8">
-                                            <input type="file" name="category_image">
-                                            <p class="help-block">Please select image</p>
-                                            @error('category_image')
-                                            <span class="text-danger" role="alert">{{ $message }}
-                                            </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-4 control-label" for="description">Category Status</label>
-                                        <div class="col-md-8">
-                                            <select name="category_status" class="selecter_3" data-selecter-options='{"cover":"true"}'>
-                                                <option value="1" @if($category_data->category_status == 1) selected @endif >Active</option>
-                                                <option value="0" @if($category_data->category_status == 0) selected @endif>Inactive</option>
+                                            <select name="datafield_status" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                                <option value="1" @if($datafield_data->field_status == 1) selected @endif >Active</option>
+                                                <option value="0" @if($datafield_data->field_status == 0) selected @endif>Inactive</option>
                                             </select>
-                                            @error('category_status')
+                                            @error('datafield_status')
                                             <span class="text-danger" role="alert">{{ $message }}
                                             </span>
                                             @enderror
@@ -79,47 +69,29 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <div class=" col-md-8">
-                                            <img src="{{ asset($category_data->category_img) }}" alt="Category Image" class="width-25">
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </form>
                         @else
-                        <form novalidate="" method="post" action="{{ route('admin.addcategory')}}" role="form" class="form-horizontal" enctype="multipart/form-data">
+                        <form novalidate="" method="post" action="{{ route('admin.addprodData')}}" role="form" class="form-horizontal" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group">
-                                <label class="col-md-2 control-label">Category Name</label>
+                                <label class="col-md-2 control-label">Data Field Name</label>
                                 <div class="col-md-3">
-                                    <input type="text" placeholder="Enter Category Name" id="category_name" class="form-control" name="category_name" value="{{old('category_name')}}">
-                                    @error('category_name')
+                                    <input type="text" placeholder="Enter Data Field Name" id="datafield_name" class="form-control" name="datafield_name" value="{{old('datafield_name')}}">
+                                    @error('datafield_name')
                                     <span class="text-danger" role="alert">{{ $message }}
                                     </span>
                                     @enderror
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-2 control-label">Category Image</label>
+                                <label class="col-md-2 control-label" for="description">Data Field Status</label>
                                 <div class="col-md-3">
-                                    <input type="file" name="category_image">
-                                    <p class="help-block">Please select image</p>
-                                    @error('category_image')
-                                    <span class="text-danger" role="alert">{{ $message }}
-                                    </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-md-2 control-label" for="description">Category Status</label>
-                                <div class="col-md-3">
-                                    <select name="category_status" class="selecter_3" data-selecter-options='{"cover":"true"}'>
+                                    <select name="datafield_status" class="selecter_3" data-selecter-options='{"cover":"true"}'>
                                         <option value="1">Active</option>
                                         <option value="0">Inactive</option>
                                     </select>
-                                    @error('category_status')
+                                    @error('datafield_status')
                                     <span class="text-danger" role="alert">{{ $message }}
                                     </span>
                                     @enderror
@@ -138,7 +110,7 @@
             <div class="content-row">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <div class="panel-title"><b>Category List</b>
+                        <div class="panel-title"><b>Data Field List</b>
                         </div>
                         <div class="panel-options">
                             <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
@@ -152,26 +124,22 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Category Name</th>
-                                        <th>Category Image</th>
-                                        <th>Category Status</th>
+                                        <th>Data Field Name</th>
+                                        <th>Data Field Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($category_list as $list)
+                                    @forelse ($datafield_list as $list)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ ucfirst($list->category_name) }}</td>
+                                        <td>{{ ucfirst($list->field_name) }}</td>
                                         <td>
-                                            <x-img-tag image_url="{{ $list->category_img }}" />
+                                            {!! html_entity_decode($CommonClass->getStatus($list->field_status)) !!}
                                         </td>
                                         <td>
-                                            {!! html_entity_decode($CommonClass->getStatus($list->category_status)) !!}
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('admin.categorylist',['category_id'=>$list->id]) }}" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-edit"></i></a>
-                                            <a href="{{ route('admin.deletecategory',$list->id) }}" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                                            <a href="{{ route('admin.prodDataList',['datafield_id'=>$list->id]) }}" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-edit"></i></a>
+                                            <a href="{{ route('admin.deleteprodData',$list->id) }}" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
                                         </td>
                                     </tr>
                                     @empty

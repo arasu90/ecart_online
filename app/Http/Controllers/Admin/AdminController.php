@@ -37,11 +37,18 @@ class AdminController extends Controller
         $barChartProductName = 0;
         $barChartProductQty = 0;
         if ($ordercount) {
-            $products = OrderItem::join('products', 'products.id', '=', 'order_items.product_id')
+            /* $products = OrderItem::join('products', 'products.id', '=', 'order_items.product_id')
                 ->groupBy('products.id')
                 ->orderby('products.id')
                 ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
+                ->get(); */
+                $products = DB::table('order_items')
+                ->join('products', 'products.id', '=', 'order_items.product_id')
+                ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
+                ->groupBy('products.id', 'products.product_name')
+                ->orderBy('products.id', 'asc')
                 ->get();
+                // dd($products);
             $barChartProductName = $products->pluck('product_name');
             $barChartProductQty = $products->pluck('total_qty');
         }

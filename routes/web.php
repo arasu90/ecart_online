@@ -102,6 +102,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/edit_product/{id}', [ProductController::class, 'editProduct'])->name('productedit');
         Route::get('/product_delete/{id}', [ProductController::class, 'deleteProduct'])->name('productdelete');
 
+        // Product Data Fields
+        Route::get('/product_data_field', [ProductController::class, 'prodDataList'])->name('prodDataList');
+        Route::post('/product_data_field/{datafieldid}', [ProductController::class, 'updateprodData'])->name('updateprodData');
+        Route::get('/deleteproduct_data_field/{id}', [ProductController::class, 'deleteprodData'])->name('deleteprodData');
+        Route::post('/product_data_field', [ProductController::class, 'addprodData'])->name('addprodData');
+
         // Orders
         Route::get('/orderlist', [AdminController::class, 'orderList'])->name('orderlist');
         Route::get('/orderview/{orderid}', [AdminController::class, 'orderView'])->name('orderview');

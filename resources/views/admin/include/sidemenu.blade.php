@@ -29,6 +29,11 @@
         </a>
     </li>
     <li class="list-group-item">
+        <a href="{{ route('admin.prodDataList') }}">
+            <i class="glyphicon glyphicon-indent-left"></i>{{ __('Product Data Field') }}
+        </a>
+    </li>
+    <li class="list-group-item">
         <a href="{{ route('admin.categorylist') }}">
             <i class="glyphicon glyphicon-indent-left"></i>{{ __('Category') }}
         </a>
