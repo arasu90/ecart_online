@@ -211,7 +211,7 @@
                                             <x-img-tag image_url="{{ $img_list->product_img }}" />
                                         </td>
                                         <td>
-                                            <a href="{{ $img_list->id }}" class="btn btn-sm btn-danger">
+                                            <a href="{{ route('admin.removeProductImg',$img_list->id) }}" class="btn btn-sm btn-danger">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </a>
                                         </td>

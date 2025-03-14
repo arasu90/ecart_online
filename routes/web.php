@@ -101,6 +101,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/add_productimg/{productid}', [ProductController::class, 'addProductImg'])->name('addproductimg');
         Route::get('/edit_product/{id}', [ProductController::class, 'editProduct'])->name('productedit');
         Route::get('/product_delete/{id}', [ProductController::class, 'deleteProduct'])->name('productdelete');
+        Route::get('/removeProductImg/{id}', [ProductController::class, 'removeProductImg'])->name('removeProductImg');
 
         // Product Data Fields
         Route::get('/product_data_field', [ProductController::class, 'prodDataList'])->name('prodDataList');

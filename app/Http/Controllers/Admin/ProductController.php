@@ -156,7 +156,19 @@ class ProductController extends Controller
         $product_img->default_img = ($request->input('default_img')) ? 1 : 0;
         $product_img->save();
 
+        return redirect()->route('admin.productedit', $productid)->with('success', 'Product Image added successfully');
+    }
 
+    public function removeProductImg($id)
+    {
+        $product_img = ProductImg::find($id);
+
+        $productid = $product_img->product_id;
+
+        if (File::exists(public_path().$product_img->product_img)) {
+            unlink(public_path().$product_img->product_img);
+        }
+        $product_img->delete();
 
         return redirect()->route('admin.productedit', $productid)->with('success', 'Product Image added successfully');
     }
