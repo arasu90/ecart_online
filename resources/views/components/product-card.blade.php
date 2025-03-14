@@ -1,7 +1,9 @@
 @props(['product_name','product_price','product_mrp','product_img','product_id','is_cart_added'])
 <div class="card product-item border-0 mb-4">
     <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-        <img class="img-fluid w-100 product-card-img" src="{{ asset($product_img) }}" alt="{{ $product_name }}">
+        <a href="{{ route('page.showproduct', $product_id) }}">
+            <img class="img-fluid w-100 product-card-img" src="{{ asset($product_img) }}" alt="{{ $product_name }}">
+        </a>
     </div>
     <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
         <h6 class="text-truncate mb-3">{{ $product_name }}</h6>

@@ -170,7 +170,7 @@ class ProductController extends Controller
         }
         $product_img->delete();
 
-        return redirect()->route('admin.productedit', $productid)->with('success', 'Product Image added successfully');
+        return redirect()->route('admin.productedit', $productid)->with('success', 'Product Image Deleted successfully');
     }
 
     public function prodDataList(Request $request)
@@ -197,7 +197,6 @@ class ProductController extends Controller
 
     public function updateprodData($datafieldid, Request $request)
     {
-        // dd($request);
         $request->validate([
             'datafield_name' => 'required|max:100|string',
             'datafield_status' => 'required',

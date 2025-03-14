@@ -108,7 +108,7 @@ $website_data_value = $CommonClass->getWebsiteData();
     .product-item .btn:hover {
     color: #de6cbe !important;
 }.btn-primary {
-    color: #212529;
+    color: #fff;
     background-color: #a268e1;
     border-color: #a268e1;
 
@@ -117,6 +117,31 @@ $website_data_value = $CommonClass->getWebsiteData();
     color: #fff;
     background-color: #de6cbe;
     border-color: #de6cbe;
+}
+
+
+btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #a268e1;
+    border-color: #a268e1;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #a268e1;
+    border-color: #a268e1;
+}
+
+.badge-primary {
+    color: #fff;
+    background-color: #a268e1;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+    color: #fff;
+    background-color: #a268e1;
+    border-color: #a268e1;
+    box-shadow: 0 0 0 0.2rem rgba(144, 104, 218, 0.5);
 }
 
     </style>

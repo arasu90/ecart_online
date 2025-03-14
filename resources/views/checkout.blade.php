@@ -135,7 +135,7 @@
                 key: '{{ getenv("RAYZORPAY_API_KEY_ID") }}', // Use the correct key ID
                 amount: orderData.amount, // Amount is in currency subunits (in paise)
                 currency: orderData.currency,
-                name: '{{ Auth::user()->name }}', // user name
+                name: 'MRSPARES', // user name
                 image: '{{ asset(getenv("PAYMENTLOGO")) }}', // img url online path
                 description: 'Test Transaction',
                 order_id: orderData.id, // Pass the order ID generated in the previous step
@@ -154,7 +154,7 @@
                             amount: orderData.amount, // Amount is in currency subunits (in paise)
                             currency: orderData.currency,
                             image: '{{ getenv("PAYMENTLOGO") }}', // img url online path
-                            description: 'Test Transaction',
+                            description: 'Buy Orders',
                             order_id: orderData.id, // Pass the order ID generated in the previous step
                             receipt: orderData.receipt,
                             'address_id': address_id,
