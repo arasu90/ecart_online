@@ -145,6 +145,79 @@
                     </div>
                 </div>
             </div>
+            <div class="content-row">
+            @if(Session::has('shipping_success'))
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    {{ Session::get('shipping_success') }}
+                </div>
+                @endif
+
+                @if(Session::has('shipping_error'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    {{ Session::get('shipping_error') }}
+                </div>
+                @endif
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title"><b>{{ __('Shipping Details') }}</b>
+                        </div>
+                        <div class="panel-options">
+                            <a class="bg" data-target="#sample-modal-dialog-1" data-toggle="modal" href="#sample-modal"><i class="entypo-cog"></i></a>
+                            <a data-rel="collapse" href="#"><i class="entypo-down-open"></i></a>
+                            <a data-rel="close" href="#!/tasks" ui-sref="Tasks"><i class="entypo-cancel"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form novalidate="" method="post" action="{{ route('admin.shipping_data_update')}}" role="form" class="form-horizontal">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Delivery Charge</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Delivery Charge" class="form-control" name="delivery_charge" value="{{ old('delivery_charge',$website_data->delivery_charge) }}">
+                                            @error('delivery_charge')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Delivery Free Charge</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Delivery Charge" class="form-control" name="delivery_free_charge" value="{{ old('delivery_free_charge',$website_data->delivery_free_charge) }}">
+                                            @error('delivery_free_charge')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Delivery Free Charge Notes</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Delivery Charge Notes" class="form-control" name="delivery_free_charge_notes" value="{{ old('delivery_free_charge_notes',$website_data->delivery_free_charge_notes) }}">
+                                            <p><small>use $amt for display amount value</small></p>
+                                            @error('delivery_free_charge_notes')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <button class="btn btn-primary" type="submit">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div><!-- panel body -->
     </div>
 </x-admin-layout>

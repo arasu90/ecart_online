@@ -12,8 +12,8 @@
                     <a href="{{ route('page.orderlist') }}" class="text-decoration-none">Order List</a>
                 </small>
                 <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-bordered table-responsive">
+                    <div class="col-md-12 table-responsive">
+                        <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>{{ __('SlNo') }}</th>

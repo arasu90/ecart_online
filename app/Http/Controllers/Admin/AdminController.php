@@ -322,4 +322,21 @@ class AdminController extends Controller
             return redirect()->route('admin.changepassword')->with('error', 'Failed to update');
         }
     }
+
+    public function shipping_data_update(Request $request)
+    {
+        $website_data = Website::first();
+        $request->validate([
+            'delivery_charge' => 'required',
+            'delivery_free_charge' => 'required',
+            'delivery_free_charge_notes' => 'required'
+        ]);
+
+        $website_data->delivery_charge = $request->input('delivery_charge');
+        $website_data->delivery_free_charge = $request->input('delivery_free_charge');
+        $website_data->delivery_free_charge_notes = $request->input('delivery_free_charge_notes');
+        $website_data->save();
+
+        return redirect()->route('admin.websitedata')->with('shipping_success', 'Shipping data updated successfully');
+    }
 }

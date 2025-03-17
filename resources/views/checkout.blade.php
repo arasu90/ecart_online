@@ -68,7 +68,14 @@
                             @foreach ($cart_value as $key_value=>$value)
                             <div class="d-flex justify-content-between mb-3 pt-1">
                                 <h6 class="font-weight-medium">{{ $key_value }}</h6>
-                                <h6 class="font-weight-medium">Rs. {{ number_format($value,2) }}</h6>
+                                <div class="d-flex flex-column align-items-end">
+                                    <h6 class="font-weight-medium">Rs. {{ number_format($value,2) }}</h6>
+                                @if(strtoupper($key_value) == 'SHIPPING')
+                                <p>
+                                    <small>{{ $shipping_text }}</small>
+                                </p>
+                                @endif
+                                </div>
                             </div>
                             @endforeach
                         </div>
@@ -76,6 +83,7 @@
                             <div class="d-flex justify-content-between mt-2">
                                 <h5 class="font-weight-bold">Total</h5>
                                 <h5 class="font-weight-bold">Rs. {{ number_format($total_value,2) }}</h5>
+                                
                             </div>
                         </div>
                     </div>

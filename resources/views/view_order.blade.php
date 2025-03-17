@@ -38,8 +38,8 @@
                                     </td> <br />
                                 </p>
                             </div>
-                            <div class="col-md-12">
-                                <table class="table table-bordered table-responsive">
+                            <div class="col-md-12 table-responsive">
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>{{ __('Sl.No') }}</th>

@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Website Data
         Route::get('/websitedata', [AdminController::class, 'websiteData'])->name('websitedata');
         Route::post('/websitedata', [AdminController::class, 'websiteDataUpdate'])->name('websitedataupdate');
+        Route::post('/shipping_data_update', [AdminController::class, 'shipping_data_update'])->name('shipping_data_update');
         
         // change Password
         Route::get('/changepassword', function(){

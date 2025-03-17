@@ -3,19 +3,19 @@
         {{ request('cart_count') }}
     </x-slot>
     @if(Session::has('success'))
-        <x-alert-msg class_type="success" msg_text="{{ Session::get('success') }}" />
+    <x-alert-msg class_type="success" msg_text="{{ Session::get('success') }}" />
     @endif
     @if(Session::has('error'))
-        <x-alert-msg class_type="danger" msg_text="{{ Session::get('error') }}" />
+    <x-alert-msg class_type="danger" msg_text="{{ Session::get('error') }}" />
     @endif
     @if(Session::has('cart_success'))
-        <x-alert-msg class_type="success" msg_text="{{ Session::get('cart_success') }}" />
+    <x-alert-msg class_type="success" msg_text="{{ Session::get('cart_success') }}" />
     @endif
     @if(Session::has('cart_warning'))
-        <x-alert-msg class_type="info" msg_text="{{ Session::get('cart_warning') }}" />
+    <x-alert-msg class_type="info" msg_text="{{ Session::get('cart_warning') }}" />
     @endif
     @if(Session::has('cart_danger'))
-        <x-alert-msg class_type="danger" msg_text="{{ Session::get('cart_danger') }}" />
+    <x-alert-msg class_type="danger" msg_text="{{ Session::get('cart_danger') }}" />
     @endif
     <!-- Cart Start -->
     <div class="container-fluid">
@@ -88,7 +88,15 @@
                         @foreach ($cart_value as $key_value=>$value)
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">{{ $key_value }}</h6>
-                            <h6 class="font-weight-medium">Rs. {{ number_format($value,2) }}</h6>
+                            <div class="d-flex flex-column align-items-end">
+                                <h6 class="font-weight-medium">Rs. {{ number_format($value,2) }}
+                                </h6>
+                                @if(strtoupper($key_value) == 'SHIPPING')
+                                <p>
+                                    <small>{{ $shipping_text }}</small>
+                                </p>
+                                @endif
+                            </div>
                         </div>
                         @endforeach
                     </div>

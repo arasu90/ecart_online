@@ -69,7 +69,14 @@ class PageController extends Controller
         $item_value = 0;
         $tax_value = 0;
         $subtotal = 0;
-        $shipping = 50;
+
+        $website_data_value = $this->getWebsiteData();
+        $delivery_free_amt = number_format($website_data_value->delivery_free_charge,0);
+        $delivery_free_amt_notes = $website_data_value->delivery_free_charge_notes;
+        $shipping = $website_data_value->delivery_charge;
+        $shipping_text = str_replace('$amt', $delivery_free_amt, $delivery_free_amt_notes);
+
+
         foreach ($cart_items as $value) {
             $without_tax = round(($value->product->product_price * (100 / (100 + ($value->product->product_tax)))), 4);
 
@@ -89,13 +96,14 @@ class PageController extends Controller
         $cart_value['Item Value'] = $item_value;
         $cart_value['Tax Value'] = $tax_value;
         $cart_value['Sub Total'] = $subtotal;
-        if ($subtotal == 0) {
+        if ($subtotal == 0 || $subtotal > $delivery_free_amt) {
             $shipping = 0;
         }
+        
         $cart_value['Shipping'] = $shipping;
 
         $total_value = $subtotal + $shipping;
-        return view('view_cart', compact('cart_items', 'cart_value', 'total_value'));
+        return view('view_cart', compact('cart_items', 'cart_value', 'total_value', 'shipping_text'));
     }
 
     public function checkout()
@@ -108,7 +116,13 @@ class PageController extends Controller
         $item_value = 0;
         $tax_value = 0;
         $subtotal = 0;
-        $shipping = 50;
+        
+        $website_data_value = $this->getWebsiteData();
+        $delivery_free_amt = number_format($website_data_value->delivery_free_charge,0);
+        $delivery_free_amt_notes = $website_data_value->delivery_free_charge_notes;
+        $shipping = $website_data_value->delivery_charge;
+        $shipping_text = str_replace('$amt', $delivery_free_amt, $delivery_free_amt_notes);
+        
         foreach ($cart_items as $value) {
             $without_tax = round(($value->product->product_price * (100 / (100 + ($value->product->product_tax)))), 4);
 
@@ -129,12 +143,15 @@ class PageController extends Controller
         $cart_value['Item Value'] = $item_value;
         $cart_value['Tax Value'] = $tax_value;
         $cart_value['Sub Total'] = $subtotal;
+        if ($subtotal == 0 || $subtotal > $delivery_free_amt) {
+            $shipping = 0;
+        }
         $cart_value['Shipping'] = $shipping;
         $total_value = $subtotal + $shipping;
 
         $address_list = AddressBook::where('user_id', Auth::id())->where('address_status', 1)->get();
 
-        return view('checkout', compact('cart_items', 'cart_value', 'total_value', 'address_list'));
+        return view('checkout', compact('cart_items', 'cart_value', 'total_value', 'address_list', 'shipping_text'));
     }
 
     public function addtocart($id, Request $request)

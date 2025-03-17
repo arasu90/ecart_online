@@ -167,10 +167,18 @@ class PaymentController extends Controller
     {
         $cart_items = CartItem::where('user_id', Auth::user()->id)->where('cart_status',2)->get();
         $subtotal = 0;
-        $shipping = 50;
+        
+        $website_data_value = $this->getWebsiteData();
+        $delivery_free_amt = number_format($website_data_value->delivery_free_charge,0);
+        $shipping = $website_data_value->delivery_charge;
+        
+
         foreach ($cart_items as $value) {
             $value->total_value = $value->product_qty * $value->product->product_price;
             $subtotal += $value->total_value;
+        }
+        if ($subtotal == 0 || $subtotal > $delivery_free_amt) {
+            $shipping = 0;
         }
         $total_value = $subtotal + $shipping;
         Log::channel('payment')->info('total val'.$total_value);
