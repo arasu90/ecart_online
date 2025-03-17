@@ -1,9 +1,9 @@
 <!-- Topbar Start -->
 <div class="container-fluid bg-secondary">
     <div class="row align-items-center py-1 px-xl-5">
-        <div class="col-lg-3 d-none d-lg-block">
+        <div class="col-lg-3 col-2 d-lg-block">
             <a href="{{ route('page.home') }}" class="text-decoration-none">
-                <img style="background-color:#fff; border-radius:40px;height:4rem;" src="{{ asset('assets/img/logo.png') }}" alt="logo">
+                <img class="logoheader" src="{{ asset('assets/img/logo.png') }}" alt="logo">
             </a>
         </div>
         <div class="col-lg-6 col-6 text-left">
@@ -19,7 +19,7 @@
             </form> -->
             <form action="{{route('product.list')}}" method="get">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="search" placeholder="Search for products">
+                    <input type="text" class="form-control search-font-size" name="search" placeholder="Search for products">
                     <div class="input-group-append">
                         <span class="input-group-text bg-transparent text-primary" onclick="event.preventDefault();this.closest('form').submit();">
                             <i class="fa fa-search"></i>
@@ -28,10 +28,10 @@
                 </div>
             </form>
         </div>
-        <div class="col-lg-3 col-6 text-right">
+        <div class="col-lg-3 col-4 text-right {{ (Auth::user()) ? 'col-lg-padding-right col-lg-padding-left' : '' }}">
             @if(Auth::user())
-            <span class="dropdown">
-                <button type="button" class="btn border dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ ucfirst(Auth::user()->name) }} <i class="fas fa-user text-primary"></i></button>
+            <span class="dropdown menu-dropdown">
+                <button type="button" class="btn border dropdown-toggle  mr-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user text-primary"></i></button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <label class="text-primary label p-2">Welcome {{ ucfirst(Auth::user()->name) }}</label>
                     <a href="{{route('profile.edit')}}" class="dropdown-item">
@@ -55,11 +55,11 @@
                 </div>
             </span>
             @else
-            <a href="{{route('login')}}" class="btn border">
+            <a href="{{route('login')}}" class="btn border abtn">
                 <i class="fas fa-user text-primary"></i>
             </a>
             @endif
-            <a href="{{ route('page.cart') }}" class="btn border">
+            <a href="{{ route('page.cart') }}" class="btn border {{ (Auth::user()) ? 'margin-left-40' : 'abtn' }} ">
                 <i class="fas fa-shopping-cart text-primary"></i>
                 <span class="badge">{{ $cart_count ?? 0 }}</span>
             </a>

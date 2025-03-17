@@ -39,7 +39,7 @@
                                 </p>
                             </div>
                             <div class="col-md-12">
-                                <table class="table table-bordered">
+                                <table class="table table-bordered table-responsive">
                                     <thead>
                                         <tr>
                                             <th>{{ __('Sl.No') }}</th>
@@ -70,7 +70,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col-md-4 offset-md-8">
+                            <div class="col-md-4 text-right offset-md-8">
                                 <p>
                                     sub total : {{ $orderMaster->sub_total }} <br />
                                     Tax : {{ $orderMaster->tax_amt }} <br />

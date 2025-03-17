@@ -13,7 +13,7 @@
                 </small>
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-responsive">
                             <thead>
                                 <tr>
                                     <th>{{ __('SlNo') }}</th>

@@ -13,7 +13,7 @@ class CommonClass
     {
         switch ($orderid) {
             case 1:
-                $this->statusName = "Order Confirm";
+                $this->statusName = "Order Confirmed";
                 $this->className = "badge-primary";
                 break;
             case 2:
