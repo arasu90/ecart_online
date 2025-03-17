@@ -32,7 +32,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Website Logo</label>
+                                        <label class="col-md-4 control-label">Site Logo</label>
                                         <div class="col-md-8">
                                             <input type="file" name="site_logo">
                                             <p class="help-block">Please select image</p>
@@ -43,7 +43,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Website Name</label>
+                                        <label class="col-md-4 control-label">Site Name</label>
                                         <div class="col-md-6">
                                             <input type="text" placeholder="Enter Website Name" class="form-control" name="site_name" value="{{ old('site_name',$website_data->site_name) }}">
                                             @error('site_name')
@@ -53,7 +53,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Website Email</label>
+                                        <label class="col-md-4 control-label">Email</label>
                                         <div class="col-md-6">
                                             <input type="text" placeholder="Enter Website Email" class="form-control" name="site_email" value="{{ old('site_email',$website_data->site_email) }}">
                                             @error('site_email')
@@ -63,7 +63,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Website Mobile</label>
+                                        <label class="col-md-4 control-label">Mobile</label>
                                         <div class="col-md-6">
                                             <input type="text" placeholder="Enter Website Mobile" class="form-control" name="site_mobile" value="{{ old('site_mobile', $website_data->site_mobile) }}">
                                             @error('site_mobile')
@@ -73,7 +73,17 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-4 control-label">Website Details</label>
+                                        <label class="col-md-4 control-label">WhatsApp Mobile</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Enter Website Mobile" class="form-control" name="whats_app_no" value="{{ old('whats_app_no', $website_data->whats_app_no) }}">
+                                            @error('whats_app_no')
+                                            <span class="text-danger" role="alert">{{ $message }}
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Details</label>
                                         <div class="col-md-6">
                                             <textarea class="form-control" name="site_detail" placeholder="Product Details">{{ old('site_detail',$website_data->site_desc) }}</textarea>
                                             @error('site_detail')

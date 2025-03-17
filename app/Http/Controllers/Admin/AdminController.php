@@ -235,6 +235,7 @@ class AdminController extends Controller
             'site_logo' => 'file|mimes:jpeg,jpg|nullable|max:10000',
             'site_email' => 'required',
             'site_mobile' => 'required',
+            'whats_app_no' => 'nullable',
             'address_line_1' => 'required',
             'address_line_2' => 'required',
             'address_city' => 'required',
@@ -249,6 +250,7 @@ class AdminController extends Controller
         $website_data->site_name = $request->input('site_name');
         $website_data->site_email = $request->input('site_email');
         $website_data->site_mobile = $request->input('site_mobile');
+        $website_data->whats_app_no = $request->input('whats_app_no');
         $website_data->site_desc = $request->input('site_detail');
         $website_data->site_address_line1 = $request->input('address_line_1');
         $website_data->site_address_line2 = $request->input('address_line_2');
