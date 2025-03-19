@@ -11,9 +11,12 @@ use App\Models\OrderItem;
 use App\Models\OrderMaster;
 use App\Models\Product;
 use App\Models\ProductReview;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -21,28 +24,69 @@ class PageController extends Controller
     
     public function home()
     {
-        $img_carousel = array('0' => array('img' => 'assets/img/carousel-1.jpg', 'text1' => '10% Off Your First Order', 'text2' => 'Fashionable Dress', 'link' => "3"), '1' => array('img' => 'assets/img/carousel-2.jpg', 'text1' => '13% Off Your First Order', 'text2' => 'Reasonable Price', 'link' => "4"));
         
-        $img_carousel = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(5)->get();
+        $img_carousel_result = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(5)->get();
 
-        $category_list = Category::with('product')->where('category_status', '1')->limit(6)->get();
+        $img_carousel = $this->resultMap($img_carousel_result, ['pid'=>'id'], ['url_product_name'=>'product_name']);
+
+        $category_result = Category::with('product')->where('category_status', '1')->limit(6)->get();
+        $category_list = $this->resultMap($category_result, ['cid'=>'id'], ['url_category_name'=>'category_name']);
 
         $brand_list = Brand::where('brand_status', '1')->get();
 
-        $trandy_product = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(8)->get();
+        $trandy_product_result = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(8)->get();
 
-        $newly_product = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(8)->get();
+        $trandy_product = $this->resultMap($trandy_product_result, ['pid'=>'id'], ['url_product_name'=>'product_name']);
+        
+        foreach($trandy_product as $tp){
+            if(isset($tp->cart_item)){
+                $tp->cart_item->cid  =  $this->encryptData($tp->cart_item->id);
+            }
+        }
+        $newly_product_result = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->inRandomOrder()->limit(8)->get();
+
+        $newly_product = $this->resultMap($newly_product_result, ['pid'=>'id'], ['url_product_name'=>'product_name']);
+
+        foreach($newly_product as $np){
+            if(isset($np->cart_item)){
+                $np->cart_item->cid  =  $this->encryptData($np->cart_item->id);
+            }
+        }
 
         return view('index', compact('img_carousel', 'category_list', 'trandy_product', 'newly_product', 'brand_list'));
     }
 
-    public function productdetail($id)
+    public function productdetail(Request $request)
     {
-        $product_data = Product::with('product_img')->with('cart_item')->with('product_field_data')->with(['product_review.users'])->find($id);
-        $related_product_list = Product::where('category_id', $product_data->category_id)->with('defaultImg')->where('id', '!=', $id)->with('cart_item')->inRandomOrder()->limit(8)->get();
-        $averageRating = $product_data->product_review->avg('review_rating');
+        try{
+            $id=$this->decryptData($request->input('pid'));
+            
+            $product_data = Product::with('product_img')->with('cart_item')->with('product_field_data')->with(['product_review.users'])->findOrFail($id);
+            $product_data->pid = $this->encryptData($product_data->id);
+            $product_data->url_product_name = $this->encryptData($product_data->product_name);
+            if(isset($product_data->cart_item)){
+                $product_data->cart_item->cid  =  $this->encryptData($product_data->cart_item->id);
+            }
+                
+            $related_product_result = Product::where('category_id', $product_data->category_id)->with('defaultImg')->where('id', '!=', $id)->with('cart_item')->inRandomOrder()->limit(8)->get();
 
-        return view('product_detail', compact('product_data', 'related_product_list', 'averageRating'));
+            $related_product_list = $this->resultMap($related_product_result, ['pid'=>'id'], ['url_product_name'=>'product_name']);
+        
+            foreach($related_product_list as $tp){
+                if(isset($tp->cart_item)){
+                    $tp->cart_item->cid  =  $this->encryptData($tp->cart_item->id);
+                }
+            }
+
+            $averageRating = $product_data->product_review->avg('review_rating');
+            
+            return view('product_detail', compact('product_data', 'related_product_list', 'averageRating'));
+        } catch ( ModelNotFoundException $e) {
+            return redirect()->route('page.error404');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return redirect()->route('page.error404');
+        }
     }
 
     public function submit_review(Request $request)
@@ -60,7 +104,7 @@ class PageController extends Controller
         $review->created_by = Auth::id();
         $review->save();
 
-        return redirect()->back()->with('success', 'Review Submitted Successfully');
+        return redirect()->back()->with('success', 'Review Submitted');
     }
 
     public function view_cart()
@@ -71,10 +115,10 @@ class PageController extends Controller
         $subtotal = 0;
 
         $website_data_value = $this->getWebsiteData();
-        $delivery_free_amt = number_format($website_data_value->delivery_free_charge,0);
+        $delivery_free_amt = $website_data_value->delivery_free_charge;
         $delivery_free_amt_notes = $website_data_value->delivery_free_charge_notes;
         $shipping = $website_data_value->delivery_charge;
-        $shipping_text = str_replace('$amt', $delivery_free_amt, $delivery_free_amt_notes);
+        $shipping_text = str_replace('$amt', number_format($delivery_free_amt,0), $delivery_free_amt_notes);
 
 
         foreach ($cart_items as $value) {
@@ -91,6 +135,10 @@ class PageController extends Controller
             $subtotal += $value->total_value;
 
             $item_value += $value->item_value;
+
+            $value->product->pid = $this->encryptData($value->product->id);
+            $value->cartid = $this->encryptData($value->id);
+            $value->product->url_product_name = Str::slug($value->product->product_name);
         }
 
         $cart_value['Item Value'] = $item_value;
@@ -118,10 +166,10 @@ class PageController extends Controller
         $subtotal = 0;
         
         $website_data_value = $this->getWebsiteData();
-        $delivery_free_amt = number_format($website_data_value->delivery_free_charge,0);
+        $delivery_free_amt = $website_data_value->delivery_free_charge;
         $delivery_free_amt_notes = $website_data_value->delivery_free_charge_notes;
         $shipping = $website_data_value->delivery_charge;
-        $shipping_text = str_replace('$amt', $delivery_free_amt, $delivery_free_amt_notes);
+        $shipping_text = str_replace('$amt', number_format($delivery_free_amt,0), $delivery_free_amt_notes);
         
         foreach ($cart_items as $value) {
             $without_tax = round(($value->product->product_price * (100 / (100 + ($value->product->product_tax)))), 4);
@@ -154,11 +202,14 @@ class PageController extends Controller
         return view('checkout', compact('cart_items', 'cart_value', 'total_value', 'address_list', 'shipping_text'));
     }
 
-    public function addtocart($id, Request $request)
+    public function addtocart(Request $request)
     {
-        $product_id = $id;
-        $product = Product::find($product_id);
         try {
+            $product_id = $this->decryptData($request->input('pid'));
+            if ($product_id == 'invalid') {
+                throw new \Exception('Invalid Product Item');
+            }
+            $product = Product::find($product_id);
             if (!$product) {
                 throw new \Exception('Product Not Found');
             }
@@ -177,11 +228,11 @@ class PageController extends Controller
                     $product_qty = $request->product_qty;
                     CartItem::where('id', $cart_item->id)->update(['product_qty' => $product_qty, 'updated_at' => now()]);
 
-                    $returnMsg = 'Cart Updated Successfully';
+                    $returnMsg = 'Cart Updated';
                 } else {
                     $product_qty = $request->product_qty;
                     CartItem::insert(['product_id' => $product_id, 'product_qty' => 1, 'user_id' => $user_id, 'created_at' => now(), 'updated_at' => now()]);
-                    $returnMsg = 'Product Added to Cart Successfully';
+                    $returnMsg = 'Cart Added';
                 }
                 return redirect()->back()->with('cart_success', $returnMsg);
             }else{
@@ -192,17 +243,20 @@ class PageController extends Controller
         }
     }
 
-    public function removetocart($id)
+    public function removetocart(Request $request)
     {
-        $cart_id = $id;
-        $cart_item = CartItem::find($cart_id);
-
         try {
+            $cart_id = $this->decryptData($request->input('cartid'));
+
+            if ($cart_id == 'invalid') {
+                throw new \Exception('Invalid Cart Item');
+            }
+            $cart_item = CartItem::find($cart_id);
             if (!$cart_item) {
                 throw new \Exception('Cart Item Not Found');
             }
             $cart_item->delete();
-            return redirect()->back()->with('cart_warning', 'Product Removed from Cart Successfully');
+            return redirect()->back()->with('cart_warning', 'Cart Removed');
         } catch (\Exception $e) {
             return redirect()->back()->with('cart_danger', $e->getMessage());
         }
@@ -241,7 +295,7 @@ class PageController extends Controller
 
     public function product_list(Request $request)
     {
-        $category = $request->query('category');
+        $category = $request->query('cid') ? $this->decryptData($request->query('cid')) : '';
         $search = $request->input('search');
         $brand = $request->input('brand');
         $product_list = Product::with('defaultImg')->with('cart_item')->where('product_status', '1')->when($category, function ($query, $category) {
@@ -251,6 +305,14 @@ class PageController extends Controller
         })->when($brand, function ($query, $brand) {
             return $query->where('brand_id', $brand);
         })->orderby('id', 'desc')->paginate(12);
+
+        foreach($product_list as $prod){
+            $prod->pid = $this->encryptData($prod->id);
+            $prod->url_product_name = Str::slug($prod->product_name);
+            if(isset($prod->cart_item)){
+                $prod->cart_item->cid  =  $this->encryptData($prod->cart_item->id);
+            }
+        }
 
         return view('productlist', compact('product_list'));
     }
@@ -269,5 +331,10 @@ class PageController extends Controller
 
     public function thankyou(){
         return view('thankyou');
+    }
+
+    public function errorNotFound()
+    {
+        return view('errors.404');
     }
 }

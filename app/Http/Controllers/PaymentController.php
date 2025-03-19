@@ -24,7 +24,7 @@ class PaymentController extends Controller
         CartItem::where('user_id', Auth::user()->id)->where('cart_status',1)->update(['cart_status' => 2]);
 
         $orderamt = $this->getCartValue();
-        $receipt = "Kalai".Uuid::randomNumber();
+        $receipt = "ecart_".Uuid::randomNumber();
         // Create an order
         $orderData = [
             'amount' => $orderamt * 100, // Amount is in paise
@@ -218,12 +218,14 @@ class PaymentController extends Controller
         $ordermaster->payment_status = 1;
         $ordermaster->save();
 
+        $website_data_value = $this->getWebsiteData();
+
         $over_all_item_value = 0;
         $over_all_discount_amt = 0;
         $over_all_sub_total = 0;
         $over_all_tax_amt = 0;
         $over_all_total_amt = 0;
-        $over_all_shipping_amt = 50;
+        $over_all_shipping_amt = $website_data_value->delivery_charge;
         $over_all_net_total_amt = 0;
         $cart_items = CartItem::with('product')->where('user_id', Auth::user()->id)->where('cart_status',3)->get();
         foreach ($cart_items as $value) {

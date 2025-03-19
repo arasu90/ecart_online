@@ -1,7 +1,7 @@
-@props(['product_name','product_price','product_mrp','product_img','product_id','is_cart_added'])
+@props(['product_name', 'product_price', 'product_mrp', 'product_img', 'product_id', 'is_cart_added', 'url_product_name'])
 <div class="card product-item border-0 mb-4">
     <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-        <a href="{{ route('page.showproduct', $product_id) }}">
+        <a href="{{ route('page.showproduct', [$url_product_name, 'pid'=>$product_id]) }}">
             <img class="img-fluid w-100 product-card-img" src="{{ asset($product_img) }}" alt="{{ $product_name }}">
         </a>
     </div>
@@ -13,16 +13,16 @@
         </div>
     </div>
     <div class="card-footer d-flex justify-content-between bg-light border">
-        <a href="{{ route('page.showproduct', $product_id) }}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+        <a href="{{ route('page.showproduct', [$url_product_name, 'pid'=>$product_id]) }}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
         @if ($is_cart_added)
-        <form method="POST" action="{{route('page.removetocart', $is_cart_added)}}">
+        <form method="POST" action="{{route('page.removetocart', ['cartid'=>$is_cart_added])}}">
             @csrf
             <button type="submit" class="btn btn-sm p-0 text-primary">
                 <i class="fas fa-check text-primary mr-1"></i>{{ __('Remove Cart') }}
             </button>
         </form>
         @else
-        <form method="POST" action="{{route('page.addtocart', $product_id)}}">
+        <form method="POST" action="{{route('page.addtocart', ['pid'=>$product_id])}}">
             @csrf
             <button type="submit" class="btn btn-sm text-dark p-0">
                 <i class="fas fa-shopping-cart text-primary mr-1"></i>{{ __('Add To Cart') }}

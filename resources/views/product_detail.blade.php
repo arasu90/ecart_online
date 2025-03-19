@@ -37,12 +37,12 @@
                 <p class="mb-4">{{ $product_data->product_detail }}</p>
                 <div class="d-flex align-items-center mb-4 pt-2">
                     @isset($product_data->cart_item->id)
-                    <form method="POST" action="{{route('page.removetocart', $product_data->cart_item->id)}}">
+                    <form method="POST" action="{{route('page.removetocart', ['cartid'=>$product_data->cart_item->cid])}}">
                         @csrf
                         <button class="btn btn-primary px-3"><i class="fa fa-check mr-1"></i>{{ __('Remove Cart') }}</button>
                     </form>
                     @else
-                    <form method="POST" action="{{route('page.addtocart', $product_data->id)}}">
+                    <form method="POST" action="{{route('page.addtocart', ['pid'=>$product_data->pid])}}">
                         @csrf
                         <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
                     </form>
@@ -160,11 +160,12 @@
                     @foreach ($related_product_list as $related_product)
                     <x-product-card
                         product_name="{{ $related_product->product_name }}"
+                        url_product_name="{{ $related_product->url_product_name }}"
                         product_img="{{ $related_product->defaultImg->product_img }}"
                         product_mrp="{{ $related_product->product_mrp }}"
                         product_price="{{ $related_product->product_price }}"
-                        product_id="{{ $related_product->id }}"
-                        is_cart_added="{{ $related_product->cart_item->id ?? 0 }}" />
+                        product_id="{{ $related_product->pid }}"
+                        is_cart_added="{{ $related_product->cart_item->cid ?? 0 }}" />
                     @endforeach
                 </div>
             </div>

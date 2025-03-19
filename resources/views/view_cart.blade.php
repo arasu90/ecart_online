@@ -44,7 +44,7 @@
                             <td class="align-middle">Rs. {{ number_format($item->product->product_mrp,2) }}</td>
                             <td class="align-middle">Rs. {{ number_format($item->product->product_price,2) }}</td>
                             <td class="align-middle">
-                                <form method="POST" action="{{ route('page.addtocart', $item->product_id) }}">
+                                <form method="POST" action="{{ route('page.addtocart', ['pid'=>$item->product->pid]) }}">
                                     @csrf
                                     <select class="form-control" name="product_qty" onchange="this.form.submit()">
                                         @for ($i = 1; $i <= 10; $i++)
@@ -55,7 +55,7 @@
                             </td>
                             <td class="align-middle">Rs. {{ number_format($item->total_value,2) }}</td>
                             <td class="align-middle">
-                                <form method="POST" action="{{route('page.removetocart', $item->id)}}">
+                                <form method="POST" action="{{route('page.removetocart', ['cartid'=>$item->cartid])}}">
                                     @csrf
                                     <button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button>
                                 </form>

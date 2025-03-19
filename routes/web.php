@@ -6,15 +6,13 @@ use App\Http\Controllers\AddressBookController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Testing;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('defaultParameter')->group(function () {
 
-    Route::get('/test', function () {
-        return view('admin.test');
-    });
-
+    Route::get('/testmr', [Testing::class,'index']);
     if (Auth::user()) {
         // Home page
         Route::middleware(['auth', 'verified'])->get('/', [PageController::class, 'home'])->name('page.home');
@@ -27,8 +25,10 @@ Route::middleware('defaultParameter')->group(function () {
         Route::get('/', [PageController::class, 'home'])->name('page.home');
 
         // product list
-        Route::get('/product_list', [PageController::class, 'product_list'])->name('product.list');
-        Route::get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
+        Route::get('/product_list/{name?}', [PageController::class, 'product_list'])->name('product.list');
+        // Route::get('/product_list', [PageController::class, 'product_list'])->name('product.lists');
+        // Route::get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
+        Route::get('/product/{name?}', [PageController::class, 'productdetail'])->name('page.showproduct');
     }
     // add review
     Route::middleware(['verified'])->post('/submit_review', [PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
@@ -36,8 +36,8 @@ Route::middleware('defaultParameter')->group(function () {
     // cart
     Route::middleware(['verified'])->get('/view_cart', [PageController::class, 'view_cart'])->name('page.cart');
     Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('page.checkout');
-    Route::post('/addtocart/{id}', [PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
-    Route::post('/removetocart/{id}', [PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
+    Route::post('/addtocart', [PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
+    Route::post('/removetocart', [PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
 
     // order list
     Route::get('/myorder_list', [PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
@@ -63,7 +63,10 @@ Route::middleware('defaultParameter')->group(function () {
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
+
+    Route::get('/error404', [PageController::class, 'errorNotFound'])->name('page.error404');
 });
+
 
 
 require __DIR__ . '/auth.php';

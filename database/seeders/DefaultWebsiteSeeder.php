@@ -24,6 +24,9 @@ class DefaultWebsiteSeeder extends Seeder
         $website_data->site_address_city = 'address_city';
         $website_data->site_address_state = 'address_state';
         $website_data->site_address_pincode = '123456';
+        $website_data->delivery_charge = '50';
+        $website_data->delivery_free_charge = '499';
+        $website_data->delivery_free_charge_notes = 'order value more than $amt delivery is free';
         $website_data->save();
     }
 }

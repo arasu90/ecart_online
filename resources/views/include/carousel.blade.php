@@ -5,9 +5,9 @@
             <img class="img-fluid" src="{{ asset($img_val->defaultImg->product_img) }}" alt="Carousel Items" />
             <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                 <div class="p-3" style="max-width: 700px;">
-                    <h4 class="text-light text-uppercase font-weight-medium mb-3">{{ $img_val->product_name }} </h4>
-                    <h3 class="display-4 text-white font-weight-semi-bold mb-4">{{ $img_val->product_detail }} </h3>
-                    <a href="{{ route('page.showproduct', $img_val->id) }} " class="btn btn-light py-2 px-3">Shop Now {{$img_val->product_id}}</a>
+                    <h4 class="text-light text-uppercase font-weight-medium mb-3">{{ $img_val->product_detail }} </h4>
+                    <h3 class="display-4 text-white font-weight-semi-bold mb-4">{{ $img_val->product_name }} </h3>
+                    <a href="{{ route('page.showproduct', [$img_val->url_product_name, 'pid'=>$img_val->pid]) }} " class="btn btn-light py-2 px-3">Shop Now {{$img_val->product_id}}</a>
                 </div>
             </div>
         </div>

@@ -9,8 +9,8 @@ $website_data_value = $CommonClass->getWebsiteData();
     <meta charset="utf-8">
     <title>MRspares Mobile, Computer Accessories Sales Online Shop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart, online buy spares, buy spares online, online sparespart buy" name="keywords">
-    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart" name="description">
+    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart, online buy spares, buy spares online, online sparespart buy, accessories mobile phone, Mobile spares in dharmapuri" name="keywords">
+    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart,mrspares - Mobile Spare Parts in dharmapuri, mobile spares, computer spares" name="description">
     <meta name="author" content="MRSpares">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -53,6 +53,7 @@ $website_data_value = $CommonClass->getWebsiteData();
 
         .dropdown-menu {
             min-width: 15rem !important;
+            transform: translate3d(-50px, 32px, 0px);
         }
 
         .text-black {
@@ -61,9 +62,10 @@ $website_data_value = $CommonClass->getWebsiteData();
 
         .toast-custom-box {
             position: absolute;
-            top: 5%;
+            top: 4%;
             right: 5%;
             min-width: 20rem;
+            font-size: 1.5rem;
         }
 
         .abtn {
@@ -110,6 +112,7 @@ $website_data_value = $CommonClass->getWebsiteData();
             }
             */
         }
+
         @media (max-width: 768px) {
             /*
             .testing{
@@ -161,37 +164,39 @@ $website_data_value = $CommonClass->getWebsiteData();
             }
             */
 
-            .margin-left-40{
+            .margin-left-40 {
                 margin-left: 40%;
             }
 
-            .col-lg-padding-left{
+            .col-lg-padding-left {
                 padding-left: 0px;
             }
 
-            .col-lg-padding-right{
+            .col-lg-padding-right {
                 padding-right: 0px;
             }
 
-            .menu-dropdown{
+            .menu-dropdown {
                 position: absolute;
             }
 
-            .search-font-size{
+            .search-font-size {
                 font-size: 0.6rem;
             }
 
             .toast-custom-box {
                 position: absolute;
-                top: 10%;
+                top: 5%;
+                font-size: 1rem;
+                min-width: 10rem;
             }
 
             .dropdown-menu {
                 transform: translate3d(-150px, 32px, 0px);
             }
 
-            .logoheader{
-                height:1rem;
+            .logoheader {
+                height: 1rem;
             }
         }
 
@@ -239,14 +244,14 @@ $website_data_value = $CommonClass->getWebsiteData();
         .product-item .btn:hover {
             color: #de6cbe !important;
         }
-        
+
         .btn-primary {
             color: #fff;
             background-color: #a268e1;
             border-color: #a268e1;
 
         }
-        
+
         .btn-primary:hover {
             color: #fff;
             background-color: #de6cbe;
@@ -254,13 +259,17 @@ $website_data_value = $CommonClass->getWebsiteData();
         }
 
 
-        btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+        btn-primary:not(:disabled):not(.disabled):active,
+        .btn-primary:not(:disabled):not(.disabled).active,
+        .show>.btn-primary.dropdown-toggle {
             color: #fff;
             background-color: #a268e1;
             border-color: #a268e1;
         }
 
-        .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+        .btn-primary:not(:disabled):not(.disabled):active,
+        .btn-primary:not(:disabled):not(.disabled).active,
+        .show>.btn-primary.dropdown-toggle {
             color: #fff;
             background-color: #a268e1;
             border-color: #a268e1;
@@ -271,13 +280,13 @@ $website_data_value = $CommonClass->getWebsiteData();
             background-color: #a268e1;
         }
 
-        .btn-primary:focus, .btn-primary.focus {
+        .btn-primary:focus,
+        .btn-primary.focus {
             color: #fff;
             background-color: #a268e1;
             border-color: #a268e1;
             box-shadow: 0 0 0 0.2rem rgba(144, 104, 218, 0.5);
         }
-
     </style>
 </head>
 
@@ -304,6 +313,19 @@ $website_data_value = $CommonClass->getWebsiteData();
     <!-- Contact Javascript File -->
     <script src="{{ asset('assets/mail/jqBootstrapValidation.min.js') }}"></script>
     <script src="{{ asset('assets/mail/contact.js') }}"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YDTH0LQHYS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-YDTH0LQHYS');
+    </script>
 
     <!-- Template Javascript -->
     <script src="{{ asset('assets/js/main.js') }}"></script>

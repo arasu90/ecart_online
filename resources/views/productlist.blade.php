@@ -156,11 +156,12 @@
                     <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
                         <x-product-card
                             product_name="{{ $listproduct->product_name }}"
+                            url_product_name="{{ $listproduct->url_product_name }}"
                             product_img="{{ $listproduct->defaultImg->product_img }}"
                             product_mrp="{{ $listproduct->product_mrp }}"
                             product_price="{{ $listproduct->product_price }}"
-                            product_id="{{ $listproduct->id }}" 
-                            is_cart_added="{{ $listproduct->cart_item->id ?? 0 }}"
+                            product_id="{{ $listproduct->pid }}" 
+                            is_cart_added="{{ $listproduct->cart_item->cid ?? 0 }}"
                         />
                     </div>
                     @endforeach
