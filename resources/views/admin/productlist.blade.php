@@ -57,7 +57,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ ucfirst($list->product_name) }}</td>
                                         <td>
-                                            <x-img-tag image_url="{{ $list->defaultImg->product_img }}" />
+                                            <x-img-tag image_url="{{ $list->defaultImg->product_img }}" img_alt="Product Image" />
                                         </td>
                                         <td>{{ $list->product_mrp }}</td>
                                         <td>{{ $list->product_price }}</td>

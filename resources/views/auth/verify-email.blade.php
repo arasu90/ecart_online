@@ -1,9 +1,9 @@
 <x-app-layout>
     <div class="row justify-content-center">
         <div class="col-6">
-            <h1 class="h3 mt-6">
+            <h2 class="h3 mt-6">
                 {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-            </h1>
+            </h2>
 
             @if (session('status') == 'verification-link-sent')
                 <div class="mb-4 font-medium text-sm text-green-600 h5">

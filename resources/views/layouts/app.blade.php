@@ -9,10 +9,12 @@ $website_data_value = $CommonClass->getWebsiteData();
     <meta charset="utf-8">
     <title>MRspares Mobile, Computer Accessories Sales Online Shop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart, online buy spares, buy spares online, online sparespart buy, accessories mobile phone, Mobile spares in dharmapuri" name="keywords">
-    <meta content="MRspares Mobile, Computer Accessories Sales Online Shop, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart,mrspares - Mobile Spare Parts in dharmapuri, mobile spares, computer spares" name="description">
+    <meta content="MRspares - Mobile, Computer Accessories in Dharmapuri, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart, online buy spares, buy spares online, online sparespart buy, accessories mobile phone, Mobile spares in dharmapuri" name="keywords">
+    <meta content="mrspares - mobile spare parts in dharmapuri, computer spare parts in dharmapuri, spareparts in dharmapuri tamilnadu, computer mobile accessories in dharmapuri" name="description">
     <meta name="author" content="MRSpares">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="alternate" href="/" hreflang="x-default">
 
     <!-- Favicon -->
     <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
@@ -41,6 +43,24 @@ $website_data_value = $CommonClass->getWebsiteData();
             background-color: rgba(195, 101, 101, 0.55);
         }
 
+        .width-45px{
+            width: 45px;
+        }
+        .height-45px{
+            height: 45px;
+        }
+        .padding-30px{
+            padding: 30px;
+        }
+        .category-img {
+            height:20rem;
+            width:100%;
+        }
+        .footerlogo{
+            background-color:#fff;
+            border-radius:40px;
+            height:4rem;
+        }
         .logoheader {
             background-color: #fff;
             border-radius: 40px;
@@ -210,8 +230,15 @@ $website_data_value = $CommonClass->getWebsiteData();
             flex: 0 0 100%;
             /* Ensure each item takes full width of the carousel */
             position: relative;
+            
         }
 
+        .carousel-item-height{
+            height: 410px;
+        }
+        .max-width-700{
+            max-width: 700px;
+        }
         .carousel-item img {
             width: 100%;
             /* Ensure image takes up full width of the carousel item */

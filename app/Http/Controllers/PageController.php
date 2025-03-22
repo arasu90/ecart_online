@@ -63,7 +63,7 @@ class PageController extends Controller
             
             $product_data = Product::with('product_img')->with('cart_item')->with('product_field_data')->with(['product_review.users'])->findOrFail($id);
             $product_data->pid = $this->encryptData($product_data->id);
-            $product_data->url_product_name = $this->encryptData($product_data->product_name);
+            $product_data->url_product_name = Str::slug($product_data->product_name);
             if(isset($product_data->cart_item)){
                 $product_data->cart_item->cid  =  $this->encryptData($product_data->cart_item->id);
             }

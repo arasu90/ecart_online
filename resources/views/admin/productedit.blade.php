@@ -208,7 +208,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <x-img-tag image_url="{{ $img_list->product_img }}" />
+                                            <x-img-tag image_url="{{ $img_list->product_img }}" img_alt="Product Image" />
                                         </td>
                                         <td>
                                             <a href="{{ route('admin.removeProductImg',$img_list->id) }}" class="btn btn-sm btn-danger">

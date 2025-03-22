@@ -3,7 +3,7 @@
         <div class="row px-xl-5 pt-5">
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
                 <a href="" class="text-decoration-none">
-                <img style="background-color:#fff; border-radius:40px;height:4rem;" src="{{ asset('assets/img/logo.png') }}" alt="logo">
+                <img class="footer-logo" src="{{ asset('assets/img/logo.png') }}" alt="logo">
                 </a>
                 <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>
                     {{ $website_data_value['site_address_line1'] }}, {{ $website_data_value['site_address_line2'] }}, <br />
@@ -21,6 +21,7 @@
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-dark mb-2" href=""><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-dark mb-2" href="{{ route('product.list') }}"><i class="fa fa-angle-right mr-2"></i>Product List</a>
+                            <a class="text-dark mb-2" href="{{ route('product.list') }}"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
                             <a class="text-dark mb-2" target="_blank" href="{{ route('page.terms') }}"><i class="fa fa-angle-right mr-2"></i>Terms & Conditions</a>
                         </div>
                     </div>

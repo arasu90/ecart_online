@@ -18,30 +18,30 @@ Route::middleware('defaultParameter')->group(function () {
         Route::middleware(['auth', 'verified'])->get('/', [PageController::class, 'home'])->name('page.home');
 
         // product list
-        Route::middleware(['verified'])->get('/product_list', [PageController::class, 'product_list'])->name('product.list');
+        Route::middleware(['verified'])->get('/product-list', [PageController::class, 'product_list'])->name('product.list');
         Route::middleware(['verified'])->get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
     } else {
         // Home page
         Route::get('/', [PageController::class, 'home'])->name('page.home');
 
         // product list
-        Route::get('/product_list/{name?}', [PageController::class, 'product_list'])->name('product.list');
+        Route::get('/product-list/{name?}', [PageController::class, 'product_list'])->name('product.list');
         // Route::get('/product_list', [PageController::class, 'product_list'])->name('product.lists');
         // Route::get('/productdetail/{id}', [PageController::class, 'productdetail'])->name('page.showproduct');
         Route::get('/product/{name?}', [PageController::class, 'productdetail'])->name('page.showproduct');
     }
     // add review
-    Route::middleware(['verified'])->post('/submit_review', [PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
+    Route::middleware(['verified'])->post('/submit-review', [PageController::class, 'submit_review'])->middleware(['auth', 'verified'])->name('submit.review');
 
     // cart
-    Route::middleware(['verified'])->get('/view_cart', [PageController::class, 'view_cart'])->name('page.cart');
+    Route::middleware(['verified'])->get('/view-cart', [PageController::class, 'view_cart'])->name('page.cart');
     Route::get('/checkout', [PageController::class, 'checkout'])->middleware(['auth', 'verified'])->name('page.checkout');
     Route::post('/addtocart', [PageController::class, 'addtocart'])->middleware(['auth', 'verified'])->name('page.addtocart');
     Route::post('/removetocart', [PageController::class, 'removetocart'])->middleware(['auth', 'verified'])->name('page.removetocart');
 
     // order list
-    Route::get('/myorder_list', [PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
-    Route::get('/view_order/{id}', [PageController::class, 'vieworder'])->middleware(['auth', 'verified'])->name('page.vieworder');
+    Route::get('/myorder-list', [PageController::class, 'myorder_list'])->middleware(['auth', 'verified'])->name('page.orderlist');
+    Route::get('/view-order/{id}', [PageController::class, 'vieworder'])->middleware(['auth', 'verified'])->name('page.vieworder');
 
     // my address
     Route::get('/myaddress', [AddressBookController::class, 'myaddress'])->middleware(['auth', 'verified'])->name('address.list');

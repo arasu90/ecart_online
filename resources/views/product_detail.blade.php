@@ -10,11 +10,11 @@
                     <div class="carousel-inner border">
                         @forelse($product_data->product_img as $key=>$image_data)
                         <div class="carousel-item {{ ($key==0) ? 'active' : '' }} ">
-                            <x-img-tag image_url="{{ $image_data->product_img }}" class="product_details" id="current" />
+                            <x-img-tag image_url="{{ $image_data->product_img }}" img_alt="{{$product_data->url_product_name}}" />
                         </div>
                         @empty
                         <div class="carousel-item active">
-                            <x-img-tag image_url="img/default_image.jpg" class="product_details" id="current" />
+                            <x-img-tag image_url="img/default_image.jpg" img_alt="{{$product_data->url_product_name}}" />
                         </div>
                         @endforelse
                     </div>

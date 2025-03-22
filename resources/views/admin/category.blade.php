@@ -164,7 +164,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ ucfirst($list->category_name) }}</td>
                                         <td>
-                                            <x-img-tag image_url="{{ $list->category_img }}" />
+                                            <x-img-tag image_url="{{ $list->category_img }}" img_alt="{{$list->category_name}}" />
                                         </td>
                                         <td>
                                             {!! html_entity_decode($CommonClass->getStatus($list->category_status)) !!}
