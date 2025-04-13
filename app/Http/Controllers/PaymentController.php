@@ -226,6 +226,8 @@ class PaymentController extends Controller
         $over_all_tax_amt = 0;
         $over_all_total_amt = 0;
         $over_all_shipping_amt = $website_data_value->delivery_charge;
+        $delivery_free_charge = $website_data_value->delivery_free_charge;
+        
         $over_all_net_total_amt = 0;
         $cart_items = CartItem::with('product')->where('user_id', Auth::user()->id)->where('cart_status',3)->get();
         foreach ($cart_items as $value) {
@@ -263,10 +265,16 @@ class PaymentController extends Controller
             $over_all_tax_amt += $orderitems->tax_amt;
             $over_all_total_amt += $orderitems->total_amt;
         }
+
+        if ($over_all_total_amt > $delivery_free_charge) {
+            $over_all_shipping_amt = 0;
+        }
         $over_all_net_total_amt += $over_all_total_amt + $over_all_shipping_amt;
 
         OrderMaster::where('id', $ordermaster->id)->update(['item_value' => $over_all_item_value, 'discount_amt' => $over_all_discount_amt,'sub_total' => $over_all_sub_total, 'tax_amt'=>$over_all_tax_amt, 'total_amt' => $over_all_total_amt, 'shipping_amt' => $over_all_shipping_amt, 'net_total_amt' => $over_all_net_total_amt]);
 
+        // $ordermaster_data = OrderMaster::where('id', $ordermaster->id)->first();
+        $ordermaster_data = OrderMaster::with('orderItems.product', 'user')->where('id', $ordermaster->id)->first();
         CartItem::where('user_id', Auth::user()->id)->where('cart_status',3)->update(['order_id' => $ordermaster->id,'cart_status' => 4]);
 
         return $ordermaster->id;
