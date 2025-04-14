@@ -40,8 +40,12 @@
                                         {!! html_entity_decode($CommonClass->getOrderStatus($order->order_status)) !!}
                                     </td>
                                     <td>{{ $order->total_amt }}</td>
-                                    <td>{{ $order->delivey_date }}</td>
-                                    <td>{{ $order->delivey_notes }}</td>
+                                    <td>
+                                        @if($order->delivery_date != "")
+                                            {{ date("d-m-Y",strtotime($order->delivery_date)) }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $order->delivery_notes }}</td>
                                     <td>
                                         <a href="{{ route('page.vieworder', $order->order_master_id) }}" class="btn btn-primary">View Order</a>
                                     </td>

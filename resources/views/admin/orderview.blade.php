@@ -168,7 +168,9 @@
                                                 </select>
                                             </td>
                                             <td>
+                                                @if($order_list->delivery_date !="")
                                                 {{ date("d-m-Y", strtotime($order_list->delivery_date)) }}
+                                                @endif
                                                 <br />
                                                 <input type="date" name="delivery_date" id="delivery_date" class="rowedit_{{$loop->iteration}} form-control mt-1" style="display:none">
                                             </td>

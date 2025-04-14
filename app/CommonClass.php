@@ -22,7 +22,7 @@ class CommonClass
                 break;
             case 3:
                 $this->statusName = "Yet to Shipping";
-                $this->className = "badge-primary";
+                $this->className = "badge-warning";
                 break;
             case 4:
                 $this->statusName = "Item Dispatched";

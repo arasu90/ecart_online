@@ -24,6 +24,7 @@
     .table>thead>tr>th {
         text-align: center;
         vertical-align: middle;
+        font-size: larger;
     }
 
     .zoom-img {

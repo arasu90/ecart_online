@@ -263,7 +263,7 @@ class PageController extends Controller
     }
     public function myorder_list()
     {
-        $order_list = OrderItem::where('user_id', Auth::id())->get();
+        $order_list = OrderItem::where('user_id', Auth::id())->orderby('id','desc')->get();
         return view('orderlist', compact('order_list'));
     }
 

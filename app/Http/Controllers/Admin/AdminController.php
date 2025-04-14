@@ -37,25 +37,22 @@ class AdminController extends Controller
         $barChartProductName = 0;
         $barChartProductQty = 0;
         if ($ordercount) {
-            /* $products = OrderItem::join('products', 'products.id', '=', 'order_items.product_id')
-                ->groupBy('products.id')
-                ->orderby('products.id')
-                ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
-                ->get(); */
                 $products = DB::table('order_items')
                 ->join('products', 'products.id', '=', 'order_items.product_id')
                 ->select('products.product_name', DB::raw('SUM(order_items.product_qty) as total_qty'))
                 ->groupBy('products.id', 'products.product_name')
-                ->orderBy('products.id', 'asc')
+                ->orderBy('total_qty', 'desc')
+                ->limit(10)
                 ->get();
                 // dd($products);
             $barChartProductName = $products->pluck('product_name');
             $barChartProductQty = $products->pluck('total_qty');
         }
         
-        $orders = OrderItem::groupBy('order_master_id')
-            ->orderby('total_amt')
+        $orders = OrderItem::groupBy('product_id')
+            ->orderby('total_amt', 'desc')
             ->select(DB::raw('count(product_id) as total_product'), DB::raw('sum(total_amt) as total_amt'))
+            ->limit(10)
             ->get();
 
         $barChartOrderValue = $orders->pluck('total_amt');
@@ -208,7 +205,7 @@ class AdminController extends Controller
 
     public function orderlist()
     {
-        $order_master_list = OrderMaster::with('users')->get();
+        $order_master_list = OrderMaster::with('users')->orderby('id', 'desc')->get();
         return view('admin.orderlist', compact('order_master_list'));
     }
 
@@ -266,9 +263,19 @@ class AdminController extends Controller
     {
         $order_item_list = OrderItem::find($orderid);
         $order_item_list->order_status = $request->input('orderstatus');
-        $order_item_list->delivery_date = $request->input('delivery_date');
+        if($request->input('delivery_date') !== ""){
+            $order_item_list->delivery_date = $request->input('delivery_date');
+        }
         $order_item_list->delivery_notes = $request->input('delivery_notes');
         $order_item_list->save();
+
+        $ordermaster_data = OrderMaster::find($order_item_list->order_master_id);
+        $ordermaster_data->order_status = $request->input('orderstatus');
+        if($request->input('delivery_date') !== ""){
+            $ordermaster_data->delivery_date = $request->input('delivery_date');
+        }
+        $ordermaster_data->delivery_notes = $request->input('delivery_notes');
+        $ordermaster_data->save();
 
         return redirect()->route('admin.orderview', $order_item_list->order_master_id);
     }

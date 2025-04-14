@@ -42,7 +42,7 @@
         <div class="panel-body">
             <div class="content-row">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <h2 class="content-row-title">Top Products</h2>
                         <div style="border: 1px dotted #37BC9B">
                             <canvas id="topProoductBarChart"
@@ -51,7 +51,7 @@
                             </canvas>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <h2 class="content-row-title">Top Orders</h2>
                         <div style="border: 1px dotted #E9573F">
                         <canvas id="topOrderBarChart"
@@ -72,7 +72,7 @@
         let data = {
             labels: @json($barChartProductName),
             datasets: [{
-                barPercentage: 0.5,
+                barPercentage: 1,
                 label: 'Products',
                 data: @json($barChartProductQty),
                 backgroundColor: [
@@ -134,7 +134,7 @@
         let orderdata = {
             labels: @json($barChartOrderValue),
             datasets: [{
-                barPercentage: 0.5,
+                barPercentage: 1,
                 label: 'Orders',
                 data: @json($barChartOrderItem),
                 backgroundColor: [

@@ -55,7 +55,11 @@
                                     @foreach ($product_list as $list)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ ucfirst($list->product_name) }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.productedit',$list->id) }}">
+                                                {{ ucfirst($list->product_name) }}
+                                            </a>
+                                        </td>
                                         <td>
                                             <x-img-tag image_url="{{ $list->defaultImg->product_img }}" img_alt="Product Image" />
                                         </td>
