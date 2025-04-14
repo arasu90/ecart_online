@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Razorpay\Api\Api;
 use App\CommonFunction;
+use App\Mail\OrderPlacedMailNotification;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -134,8 +136,6 @@ class PaymentController extends Controller
             $data['payment_status'] = '2';
             $this->insertPaymentHistory($data);
             
-
-            // Session::put('thankyou_success',"Successfully");
             return response()->json(['status' => 'success','message'=>'success']);
         } catch (\Exception $e) {
 
@@ -158,7 +158,6 @@ class PaymentController extends Controller
             
             $this->insertPaymentHistory($data);
 
-            // Session::put('thankyou_failed',"failed order payment");
             return response()->json(['status' => 'failure', 'message' => $e->getMessage()]);
         }
     }
@@ -273,9 +272,23 @@ class PaymentController extends Controller
 
         OrderMaster::where('id', $ordermaster->id)->update(['item_value' => $over_all_item_value, 'discount_amt' => $over_all_discount_amt,'sub_total' => $over_all_sub_total, 'tax_amt'=>$over_all_tax_amt, 'total_amt' => $over_all_total_amt, 'shipping_amt' => $over_all_shipping_amt, 'net_total_amt' => $over_all_net_total_amt]);
 
-        // $ordermaster_data = OrderMaster::where('id', $ordermaster->id)->first();
+        // for mail sending purpose
         $ordermaster_data = OrderMaster::with('orderItems.product', 'user')->where('id', $ordermaster->id)->first();
+
         CartItem::where('user_id', Auth::user()->id)->where('cart_status',3)->update(['order_id' => $ordermaster->id,'cart_status' => 4]);
+        
+        // mail log add queue for send order notifications
+        Log::channel('payment')->info("ordermail send to user", [
+            'user_id' => Auth::user()->id,
+            'order_id' => $ordermaster->id,
+            'email' => $ordermaster_data->user->email,
+        ]);
+        
+        $queue_id = Mail::to($ordermaster_data->user->email)->send(new OrderPlacedMailNotification($ordermaster_data));
+
+        Log::channel('payment')->info("sending mail", [
+            'queue_id' => $queue_id,
+        ]);
 
         return $ordermaster->id;
     }

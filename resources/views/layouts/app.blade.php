@@ -56,10 +56,10 @@ $website_data_value = $CommonClass->getWebsiteData();
             height:20rem;
             width:100%;
         }
-        .footerlogo{
+        .footer-logo{
             background-color:#fff;
             border-radius:40px;
-            height:4rem;
+            height:3rem;
         }
         .logoheader {
             background-color: #fff;

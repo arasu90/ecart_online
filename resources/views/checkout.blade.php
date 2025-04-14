@@ -148,6 +148,7 @@
                 description: 'Test Transaction',
                 order_id: orderData.id, // Pass the order ID generated in the previous step
                 handler: function(response) {
+                    $('#pageLoader').show();
                     // Handle the payment success here
                     fetch('/payment-callback', {
                         method: 'POST',
