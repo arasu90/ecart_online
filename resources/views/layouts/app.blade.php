@@ -7,14 +7,14 @@ $website_data_value = $CommonClass->getWebsiteData();
 
 <head>
     <meta charset="utf-8">
-    <title>MRspares Mobile, Computer Accessories Sales Online Shop</title>
+    <title>MRspares Mobile, Computer Accessories in Dharmapuri, online buy accessories in dharmapuri, dharmapuri mobile accessories</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="MRspares - Mobile, Computer Accessories in Dharmapuri, Mobile spares sales, computer spares sales, mobile accessories, computer accessories, MRSPARES, mrspares, MRspares, sparepart sales, mobiles sparespart, computer sparespart, online buy spares, buy spares online, online sparespart buy, accessories mobile phone, Mobile spares in dharmapuri" name="keywords">
     <meta content="mrspares - mobile spare parts in dharmapuri, computer spare parts in dharmapuri, spareparts in dharmapuri tamilnadu, computer mobile accessories in dharmapuri, mobile accessories, computer accessories, sparepart sales, mobiles sparespart, computer sparespart, online sparespart buy, accessories for mobile phone" name="description">
     <meta name="author" content="MRSpares">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="alternate" href="/" hreflang="x-default">
+    <link rel="alternate" href="{{url('/')}}" hreflang="en">
 
     <!-- Favicon -->
     <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
